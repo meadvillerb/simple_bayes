@@ -2,6 +2,12 @@
 
 Classifier is a general module to allow Bayesian and other types of classifications.
 
+== About this Fork
+
+The goal is to reduce memory usage and increase speed when classifying large numbers of long-ish documents (600+).
+
+GSL has been added as a dependency, and the gemspec is a file so that the gem can be installed from Github using Bundler.
+
 == Download
 
 * http://rubyforge.org/projects/classifier
