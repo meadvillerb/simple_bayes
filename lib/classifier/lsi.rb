@@ -128,19 +128,24 @@ module Classifier
     # turning the LSI class into a simple vector search engine.
     def build_index( cutoff=0.75 )
       return unless needs_rebuild?
-      make_word_list
+      
+      profile('Word list') { make_word_list }
       
       doc_list = @items.values
-      tda = doc_list.collect { |node| node.raw_vector_with( @word_list ) }
+      tda = profile('Raw vectors') {
+        doc_list.collect { |node| node.raw_vector_with( @word_list ) }
+      }
       
       if $GSL
          tdm = GSL::Matrix.alloc(*tda).trans
-         ntdm = build_reduced_matrix(tdm, cutoff)
-
-         ntdm.size[1].times do |col| 
-           vec = GSL::Vector.alloc( ntdm.column(col) ).row
-           doc_list[col].lsi_vector = vec
-           doc_list[col].lsi_norm = vec.normalize
+         ntdm = profile('Matrix') { build_reduced_matrix(tdm, cutoff) }
+         
+         ntdm.size[1].times do |col|
+           profile('Vector') {
+             vec = GSL::Vector.alloc( ntdm.column(col) ).row
+             doc_list[col].lsi_vector = vec
+             doc_list[col].lsi_norm = vec.normalize
+           }
          end
       else
          tdm = Matrix.rows(tda).trans
@@ -167,9 +172,15 @@ module Classifier
        return [] if needs_rebuild?
        
        avg_density = Hash.new
-       @items.each_key { |x| avg_density[x] = proximity_array_for_content(x).inject(0.0) { |x,y| x + y[1]} }
+       @items.each_key { |x|
+         avg_density[x] =
+          proximity_array_for_content(x).inject(0.0) { |y,z| y + z[1] }
+      }
        
-       avg_density.keys.sort_by { |x| avg_density[x] }.reverse[0..max_chunks-1].map
+       avg_density.keys.
+        sort_by { |x| avg_density[x] }.
+        reverse[0..max_chunks-1].
+        map
     end
 
     # This function is the primitive that find_related and classify 
@@ -324,6 +335,14 @@ module Classifier
       end
     end
 
+
+    def profile( msg, &block )
+      t = Time.now
+      result = block.call
+      puts "#{msg}: #{Time.now - t}s" if ENV['VERBOSE']
+      
+      result
+    end
   end
 end
 
