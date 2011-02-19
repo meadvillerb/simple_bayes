@@ -14,6 +14,14 @@ class String
     tr( ',?.!;:"@#$%^&*()_=+[]{}\|<>/`~', " " ) .tr( "'\-", "")
   end
   
+  def mixed?
+    letter_index = index(/[A-z]/) || -1
+    number_index = index(/[0-9]/) || -1
+    
+    (letter_index == 0 && number_index > 0) ||
+    (number_index == 0 && letter_index > 0)
+  end
+  
   # Return a Hash of strings => ints. Each word in the string is stemmed,
   # interned, and indexes to its frequency in the document.  
 	def word_hash
@@ -32,7 +40,7 @@ class String
 		words.each do |word|
 			word.downcase! if word =~ /[\w]+/
 			key = word.stem.intern
-			if word =~ /[^\w]/ || ! CORPUS_SKIP_WORDS.include?(word) && word.length > 2
+			if word =~ /[^\w]/ || ! CORPUS_SKIP_WORDS.include?(word) && word.length > 2 && ! word.mixed?
 				d[key] ||= 0
 				d[key] += 1
 			end

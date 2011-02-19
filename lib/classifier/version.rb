@@ -1,3 +1,3 @@
 module Classifier
-  VERSION = '1.3.4' unless defined? VERSION
+  VERSION = '1.3.5' unless defined? VERSION
 end
