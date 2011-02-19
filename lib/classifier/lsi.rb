@@ -59,8 +59,19 @@ module Classifier
     #   lsi.add_item ar, *ar.categories { |x| ar.content }
     #
     def add_item( item, *categories, &block )
-      clean_word_hash = block ? block.call(item).clean_word_hash : item.to_s.clean_word_hash
-      @items[item] = ContentNode.new(clean_word_hash, *categories)
+      if item.is_a? Array
+        key = item[0]
+        item = item[1]
+      else
+        key = item
+        item = item
+      end
+      
+      clean_word_hash = block ?
+        block.call(item).clean_word_hash :
+        item.to_s.clean_word_hash
+      
+      @items[key] = ContentNode.new(clean_word_hash, *categories)
       @version += 1
       build_index if @auto_rebuild
     end
