@@ -140,13 +140,13 @@ module Classifier
          tdm = GSL::Matrix.alloc(*tda).trans
          ntdm = profile('Matrix') { build_reduced_matrix(tdm, cutoff) }
          
-         ntdm.size[1].times do |col|
-           profile('Vector') {
+         profile('Vectors') {
+           ntdm.size[1].times do |col|
              vec = GSL::Vector.alloc( ntdm.column(col) ).row
              doc_list[col].lsi_vector = vec
              doc_list[col].lsi_norm = vec.normalize
-           }
-         end
+           end
+         }
       else
          tdm = Matrix.rows(tda).trans
          ntdm = build_reduced_matrix(tdm, cutoff)
