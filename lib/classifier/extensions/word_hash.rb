@@ -5,7 +5,6 @@
 # These are extensions to the String class to provide convenience 
 # methods for the Classifier package.
 class String
-  
   # Removes common punctuation symbols, returning a new string. 
   # E.g.,
   #   "Hello (greeting's), with {braces} < >...?".without_punctuation
@@ -15,40 +14,36 @@ class String
   end
   
   def mixed?
-    letter_index = index(/[A-z]/) || -1
-    number_index = index(/[0-9]/) || -1
-    
-    (letter_index == 0 && number_index > 0) ||
-    (number_index == 0 && letter_index > 0)
+    !!((self=~/^[A-z]/ && index(/[0-9]/)) || (self=~/^\d/ && index(/[A-z]/)))
   end
   
   # Return a Hash of strings => ints. Each word in the string is stemmed,
   # interned, and indexes to its frequency in the document.  
-	def word_hash
-		word_hash_for_words(gsub(/[^\w\s]/,"").split + gsub(/[\w]/," ").split)
-	end
+  def word_hash
+    word_hash_for_words( gsub(/[^\w\s]/,"").split + gsub(/[\w]/," ").split )
+  end
 
-	# Return a word hash without extra punctuation or short symbols, just stemmed words
-	def clean_word_hash
-		word_hash_for_words gsub(/[^\w\s]/,"").split
-	end
-	
-	private
-	
-	def word_hash_for_words(words)
-		d = Hash.new
-		words.each do |word|
-			word.downcase! if word =~ /[\w]+/
-			if word =~ /[^\w]/ || ! CORPUS_SKIP_WORDS.include?(word) && word.length > 2 && ! word.mixed?
-			  key = word.stem.intern
-				d[key] ||= 0
-				d[key] += 1
-			end
-		end
-		return d
-	end
-	
-	CORPUS_SKIP_WORDS = [
+  # Return a word hash without extra punctuation or short symbols, just stemmed words
+  def clean_word_hash
+    word_hash_for_words gsub(/[^\w\s]/,"").split
+  end
+  
+  private
+  
+  def word_hash_for_words(words)
+    d = Hash.new
+    words.each do |word|
+      word.downcase! if word =~ /[\w]+/
+      if word =~ /[^\w]/ || ! CORPUS_SKIP_WORDS.include?(word) && word.length > 2 && ! word.mixed?
+        key = word.stem.intern
+        d[key] ||= 0
+        d[key] += 1
+      end
+    end
+    return d
+  end
+  
+  CORPUS_SKIP_WORDS = [
       "a",
       "again",
       "all",

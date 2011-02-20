@@ -34,9 +34,9 @@ module Classifier
     # key for mapping the vector space.
     def raw_vector_with( word_list )
       if $GSL
-         vec = GSL::Vector.alloc(word_list.size)
+        vec = GSL::Vector.alloc(word_list.size)
       else
-         vec = Array.new(word_list.size, 0)
+        vec = Array.new(word_list.size, 0)
       end
 
       @word_hash.each_key do |word|
@@ -59,11 +59,11 @@ module Classifier
       end
       
       if $GSL
-         @raw_norm   = vec.normalize
-         @raw_vector = vec
+        @raw_norm   = vec.normalize
+        @raw_vector = vec
       else
-         @raw_norm   = Vector[*vec].normalize
-         @raw_vector = Vector[*vec]
+        @raw_norm   = Vector[*vec].normalize
+        @raw_vector = Vector[*vec]
       end
     end   
   
