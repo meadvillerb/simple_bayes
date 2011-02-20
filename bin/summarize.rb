@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
 begin
-        require 'rubygems'
-        require 'classifier'
+  require 'rubygems'
+  require 'classifier'
 rescue
-        require 'classifier'
+  require 'classifier'
 end
 
 require 'open-uri'

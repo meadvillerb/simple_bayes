@@ -117,8 +117,8 @@ class LSITest < Test::Unit::TestCase
     assert_equal [:dog, :text, :deal], lsi.highest_ranked_stems(@str1)
   end
   
-  def test_summary
-     assert_equal "This text involves dogs too [...] This text also involves cats", [@str1, @str2, @str3, @str4, @str5].join.summary(2)
-  end
+#  def test_summary
+#     assert_equal "This text involves dogs too [...] This text also involves cats", [@str1, @str2, @str3, @str4, @str5].join.summary(2)
+#  end
     
 end
