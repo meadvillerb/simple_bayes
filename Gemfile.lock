@@ -8,13 +8,56 @@ PATH
 GEM
   remote: http://rubygems.org/
   specs:
+    addressable (2.2.4)
+    datamapper (1.0.2)
+      dm-aggregates (= 1.0.2)
+      dm-constraints (= 1.0.2)
+      dm-core (= 1.0.2)
+      dm-migrations (= 1.0.2)
+      dm-serializer (= 1.0.2)
+      dm-timestamps (= 1.0.2)
+      dm-transactions (= 1.0.2)
+      dm-types (= 1.0.2)
+      dm-validations (= 1.0.2)
+    dm-aggregates (1.0.2)
+      dm-core (~> 1.0.2)
+    dm-constraints (1.0.2)
+      dm-core (~> 1.0.2)
+      dm-migrations (~> 1.0.2)
+    dm-core (1.0.2)
+      addressable (~> 2.2)
+      extlib (~> 0.9.15)
+    dm-migrations (1.0.2)
+      dm-core (~> 1.0.2)
+    dm-serializer (1.0.2)
+      dm-core (~> 1.0.2)
+      fastercsv (~> 1.5.3)
+      json_pure (~> 1.4)
+    dm-timestamps (1.0.2)
+      dm-core (~> 1.0.2)
+    dm-transactions (1.0.2)
+      dm-core (~> 1.0.2)
+    dm-types (1.0.2)
+      dm-core (~> 1.0.2)
+      fastercsv (~> 1.5.3)
+      json_pure (~> 1.4)
+      stringex (~> 1.1.0)
+      uuidtools (~> 2.1.1)
+    dm-validations (1.0.2)
+      dm-core (~> 1.0.2)
+    extlib (0.9.15)
     fast-stemmer (1.0.0)
+    fastercsv (1.5.4)
     gsl (1.14.5)
       narray (>= 0.5.9)
+    json_pure (1.5.1)
     narray (0.5.9.9)
+    stringex (1.1.0)
+    uuidtools (2.1.2)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   classifier!
+  datamapper
