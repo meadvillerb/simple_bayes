@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require File.expand_path('../../test_helper', __FILE__)
+
 class LSITest < Test::Unit::TestCase
 	def setup
 	  # we repeat principle words to help weight them. 
