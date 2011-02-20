@@ -334,9 +334,14 @@ module Classifier
     
     def make_word_list
       @word_list = WordList.new
+      common_words = []
+      
       @items.each_value do |node|
-        node.word_hash.each_key { |key| @word_list.add_word key }
+        @word_list.add_words node.word_hash.keys
+        common_words = node.word_hash.keys & common_words
       end
+      
+      @word_list.remove_words common_words
     end
 
 

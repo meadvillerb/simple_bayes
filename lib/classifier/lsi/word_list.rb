@@ -17,6 +17,14 @@ module Classifier
       @location_table[term] = @location_table.size unless @location_table[term]
     end
     
+    def add_words(words)
+      words.each { |word| add_word(word) }
+    end
+    
+    def remove_words(words)
+      words.each { |word| @location_table.delete(word) }
+    end
+    
     # Returns the dimension of the word or nil if the word is not in the space.
     def [](lookup)
       term = lookup
