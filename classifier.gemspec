@@ -23,6 +23,6 @@ Gem::Specification.new do |s|
   s.add_dependency('gsl', '>= 1.1.0')
   s.requirements << "A math library to speed up LSI classification."
   
-  s.add_dependency('datamapper', '>= 1.0.2')
+  s.add_dependency('sequel', '~> 3.2')
   s.requirements << "ORM for persisting LSI data."
 end

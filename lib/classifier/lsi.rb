@@ -16,9 +16,11 @@ rescue LoadError
   require 'classifier/extensions/vector'
 end
 
-require 'classifier/lsi/word_list'
+require 'sequel'
+
+require 'classifier/lsi/migrate'
 require 'classifier/lsi/content_node'
-# require 'classifier/lsi/summary'
+require 'classifier/lsi/old_word_list'
 
 module Classifier
 
@@ -27,27 +29,45 @@ module Classifier
   # information on the algorithms used, please consult
   # Wikipedia[http://en.wikipedia.org/wiki/Latent_Semantic_Indexing].
   class LSI
-
-    attr_reader :word_list
+    attr_reader   :db
     attr_accessor :auto_rebuild
-
+    
     # Create a fresh index.
     # If you want to call #build_index manually, use
     #    Classifier::LSI.new :auto_rebuild => false
-    #
+    # 
+    # If you want to work with data on disk in an sqlite database, pass the
+    # absolute path to a .sqlite file as options[:db].
     def initialize(options = {})
       @auto_rebuild = true unless options[:auto_rebuild] == false
-      @word_list, @items = WordList.new, {}
       @version, @built_at_version = 0, -1
+      
+      @db = Sequel.sqlite(options[:db])
+      migrate
     end
-
+    
     # Returns true if the index needs to be rebuilt.  The index needs
     # to be built after all informaton is added, but before you start
     # using it for search, classification and cluster detection.
     def needs_rebuild?
-      (@items.keys.size > 1) && (@version != @built_at_version)
+      ContentNode.count > 1 && @version != @built_at_version
     end
-
+    
+    # List all categories in the database.
+    def categories
+      @db[:categories].all.map(&:name)
+    end
+    
+    # List all words in the database, by frequency.
+    def words
+      @db[:words].all.map(&:stem)
+    end
+    
+    # List all items
+    def items
+      @db[:content_nodes].all
+    end
+    
     # Adds an item to the index. item is assumed to be a string, but 
     # any item may be indexed so long as it responds to #to_s or if
     # you provide an optional block explaining how the indexer can 
@@ -61,7 +81,7 @@ module Classifier
     #  ar = ActiveRecordObject.find( :all )
     #  lsi.add_item ar, *ar.categories { |x| ar.content }
     #
-    def add_item( item, *categories, &block )
+    def add_item( item, *categories )
       if item.is_a? Array
         key = item[0]
         item = item[1]
@@ -69,23 +89,20 @@ module Classifier
         key = item
         item = item
       end
-
-      clean_word_hash = block ?
-      block.call(item).clean_word_hash :
-      item.to_s.clean_word_hash
-
-      @items[key] = ContentNode.new(clean_word_hash, *categories)
+      
+      ContentNode.new( self, item, categories: categories )
+      
       @version += 1
       build_index if @auto_rebuild
     end
-
+    
     # A less flexible shorthand for add_item that assumes 
     # you are passing in a string with no categorries. item
     # will be duck typed via to_s.
     def <<( item )
       add_item item
     end
-
+    
     # Returns the categories for a given indexed items. You are free to add and 
     # remove items from this as you see fit. It does not invalide an index to
     # change its categories.
@@ -338,7 +355,7 @@ module Classifier
     end
 
     def make_word_list
-      @word_list = WordList.new
+      @word_list = OldWordList.new
       common_words = []
 
       @items.each_value do |node|

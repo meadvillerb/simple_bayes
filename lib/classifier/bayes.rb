@@ -10,7 +10,9 @@ class Bayes
   #      b = Classifier::Bayes.new 'Interesting', 'Uninteresting', 'Spam'
   def initialize(*categories)
     @categories = Hash.new
-    categories.each { |category| @categories[category.prepare_category_name] = Hash.new }
+    categories.each { |category|
+      @categories[prepare_category_name(category)] = Hash.new
+    }
     @total_words = 0
   end
 
@@ -22,8 +24,8 @@ class Bayes
   #     b.train "that", "That text"
   #     b.train "The other", "The other text"
   def train(category, text)
-    category = category.prepare_category_name
-    text.word_hash.each do |word, count|
+    category = prepare_category_name(category)
+    WordHash.new(text, false).each do |word, count|
       @categories[category][word]     ||=     0
       @categories[category][word]      +=     count
       @total_words += count
@@ -39,8 +41,8 @@ class Bayes
   #     b.train :this, "This text"
   #     b.untrain :this, "This text"
   def untrain(category, text)
-    category = category.prepare_category_name
-    text.word_hash.each do |word, count|
+    category = prepare_category_name(category)
+    WordHash.new(text, false).each do |word, count|
       if @total_words >= 0
         orig = @categories[category][word]
         @categories[category][word]     ||=     0
@@ -64,7 +66,7 @@ class Bayes
     @categories.each do |category, category_words|
       score[category.to_s] = 0
       total = category_words.values.inject(0) {|sum, element| sum+element}
-      text.word_hash.each do |word, count|
+      WordHash.new(text, false).each do |word, count|
         s = category_words.has_key?(word) ? category_words[word] : 0.1
         score[category.to_s] += Math.log(s/total.to_f)
       end
@@ -90,7 +92,7 @@ class Bayes
   #     b.untrain_that "That text"
   #     b.train_the_other "The other text"
   def method_missing(name, *args)
-    category = name.to_s.gsub(/(un)?train_([\w]+)/, '\2').prepare_category_name
+    category = prepare_category_name(name.to_s.gsub(/(un)?train_([\w]+)/, '\2'))
     if @categories.has_key? category
       args.each { |text| eval("#{$1}train(category, text)") }
     elsif name.to_s =~ /(un)?train_([\w]+)/
@@ -119,10 +121,17 @@ class Bayes
   # more criteria than the trained selective categories. In short,
   # try to initialize your categories at initialization.
   def add_category(category)
-    @categories[category.prepare_category_name] = Hash.new
+    @categories[prepare_category_name(category)] = Hash.new
   end
   
   alias append_category add_category
+  
+  
+  private
+  
+  def prepare_category_name(category)
+    category.to_s.gsub("_"," ").capitalize.intern
+  end
 end
 
 end

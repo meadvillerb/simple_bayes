@@ -6,7 +6,7 @@ module Classifier
   # This class keeps a word => index mapping. It is used to map stemmed words
   # to dimensions of a vector.
     
-  class WordList
+  class OldWordList
     def initialize
       @location_table = Hash.new
     end
