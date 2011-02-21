@@ -52,7 +52,7 @@ module Classifier
     
     # Test if the string contains letters AND numbers.
     def mixed_alphanumeric?( s )
-      !!((s =~ /^[A-z]/ && s.index(/[0-9]/)) || (s =~ /^\d/ && s.index(/[A-z]/)))
+      !!((s=~/^[A-z]/ && s.index(/[0-9]/)) || (s=~/^\d/ && s.index(/[A-z]/)))
     end
     
     def valid?( s )
