@@ -83,18 +83,20 @@ module Classifier
     #  lsi.add_item "This is just plain text", :categories => "Plain"
     #
     def add_item( item, options={}, *old_categories )
-      # for backwards compatibility with item, *categories syntax:
-      unless options.is_a? Hash
-        options = { :categories => [*options] + [*old_categories] }
-      end
+      profile("Adding item #{options[:key] || item}") {
+        # for backwards compatibility with item, *categories syntax:
+        unless options.is_a? Hash
+          options = { :categories => [*options] + [*old_categories] }
+        end
       
-      node = ContentNode.new( self, item, options )
-      @nodes << node
+        node = ContentNode.new( self, item, options )
+        @nodes << node
       
-      @version += 1
-      build_index if @auto_rebuild
+        @version += 1
+        build_index if @auto_rebuild
       
-      node
+        node
+      }
     end
     
     # A less flexible shorthand for add_item that assumes 
