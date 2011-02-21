@@ -44,10 +44,6 @@ module Classifier
       @auto_rebuild = true unless options[:auto_rebuild] == false
       @version, @built_at_version = 0, -1
       
-      if options[:db] && File.exist?(options[:db])
-        raise "Database already exists at #{options[:db]}"
-      end
-      
       @db = Sequel.sqlite(options[:db])
       migrate
       
@@ -83,20 +79,18 @@ module Classifier
     #  lsi.add_item "This is just plain text", :categories => "Plain"
     #
     def add_item( item, options={}, *old_categories )
-      profile("Adding item #{options[:key] || item}") {
-        # for backwards compatibility with item, *categories syntax:
-        unless options.is_a? Hash
-          options = { :categories => [*options] + [*old_categories] }
-        end
+      # for backwards compatibility with item, *categories syntax:
+      unless options.is_a? Hash
+        options = { :categories => [*options] + [*old_categories] }
+      end
       
-        node = ContentNode.new( self, item, options )
-        @nodes << node
+      node = ContentNode.new( self, item, options )
+      @nodes << node
       
-        @version += 1
-        build_index if @auto_rebuild
+      @version += 1
+      build_index if @auto_rebuild
       
-        node
-      }
+      node
     end
     
     # A less flexible shorthand for add_item that assumes 

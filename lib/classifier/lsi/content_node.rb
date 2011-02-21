@@ -163,36 +163,38 @@ module Classifier
       # Creates the raw vector using all words in the classifier as the
       # key for mapping the vector space.
       def generate_raw_vector
-        vec = $GSL ?
-          GSL::Vector.alloc(lsi_words.size) : 
-          Array.new(lsi_words.size, 0)
+        lsi.send(:profile, "Generate raw vector for #{@db_id}") {
+          vec = $GSL ?
+            GSL::Vector.alloc(lsi_words.size) : Array.new(lsi_words.size, 0)
         
-        words.each do |word, frequency|
-          vec[ lsi_words[word] ] = frequency if lsi_words.includes?(word)
-        end
-        
-        # Perform the scaling transform
-        total_words = vec.sum
-        
-        # Perform first-order association transform if this vector has more
-        # than one word in it. 
-        if total_words > 1.0
-          weighted_t = 0.0
-          vec.each do |term|
-            if term > 0
-              weighted_t += (term / total_words) * Math.log(term / total_words)
-            end
+          words.each do |word, frequency|
+            vec[ lsi_words[word] ] = frequency if lsi_words.includes?(word)
           end
-          vec = vec.collect { |val| Math.log( val + 1 ) / -weighted_t }
-        end
         
-        if $GSL
-          self.raw_norm   = vec.normalize
-          self.raw_vector = vec
-        else
-          self.raw_norm   = Vector[*vec].normalize
-          self.raw_vector = Vector[*vec]
-        end
+          # Perform the scaling transform
+          total_words = vec.sum
+        
+          # Perform first-order association transform if this vector has more
+          # than one word in it. 
+          if total_words > 1.0
+            weighted_t = 0.0
+            vec.each do |term|
+              if term > 0
+                weighted_t +=
+                  (term / total_words) * Math.log(term / total_words)
+              end
+            end
+            vec.map! { |val| Math.log( val + 1 ) / -weighted_t }
+          end
+        
+          if $GSL
+            self.raw_norm   = vec.normalize
+            self.raw_vector = vec
+          else
+            self.raw_norm   = Vector[*vec].normalize
+            self.raw_vector = Vector[*vec]
+          end
+        }
       end
       
       

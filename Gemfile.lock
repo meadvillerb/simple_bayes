@@ -5,6 +5,7 @@ PATH
       fast-stemmer (>= 1.0.0)
       gsl (>= 1.1.0)
       sequel (~> 3.2)
+      sqlite3 (~> 1.3)
 
 GEM
   remote: http://rubygems.org/

@@ -4,6 +4,8 @@ module Classifier
     def migrate
       raise "No database defined!" unless @db
       
+      return if @db["SELECT name FROM sqlite_master WHERE type='table'"].any?
+      
       @db.create_table :content_nodes do
         primary_key :id
         String :retrieval_key, :unique => true, :null => false
