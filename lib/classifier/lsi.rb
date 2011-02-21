@@ -314,9 +314,8 @@ module Classifier
     private
     
     def build_reduced_matrix( tda, cutoff=0.75 )
-      u, v, s = $GSL ?
-        GSL::Matrix.alloc(*tda).trans.SV_decomp :
-        Matrix.rows(tda).trans.SV_decomp
+      u, v, s =
+        ($GSL ? GSL::Matrix.alloc(*tda) : Matrix.rows(tda)).trans.SV_decomp
       
       # TODO: Better than 75% term, please. :\
       s_cutoff = s.sort.reverse[(s.size * cutoff).round - 1]
