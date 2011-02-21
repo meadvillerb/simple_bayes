@@ -2,6 +2,8 @@
 # Copyright:: Copyright (c) 2005 David Fayram II
 # License::   LGPL
 
+require 'base64'
+
 module Classifier
   class LSI
     
@@ -9,7 +11,6 @@ module Classifier
     # raw_vector_with, it should be fairly straightforward to understand.
     # You should never have to use it directly.
     class ContentNode
-      attr_accessor :raw_vector, :raw_norm, :lsi_vector, :lsi_norm
       attr_reader :lsi
       
       # Finds all nodes matching the conditions.
@@ -134,14 +135,30 @@ module Classifier
         @words.keys || word_records.map { |w| w[:stem] }.sort
       end
       
+      [:raw_vector, :raw_norm, :lsi_vector, :lsi_norm].each do |vec|
+        define_method vec do
+          @db_id && record[vec] ?
+            Marshal.load(Base64.decode64(record[vec])) :
+            instance_variable_get("@#{vec}")
+        end
+        
+        define_method "#{vec}=" do |val|
+          return instance_variable_set("@#{vec}", val) unless @db_id
+          
+          db[:content_nodes].filter(:id => @db_id).update(
+            vec => Base64.encode64(Marshal.dump(val))
+          )
+        end
+      end
+      
       # Use this to fetch the appropriate search vector.
       def search_vector
-        @lsi_vector || @raw_vector
+        self.lsi_vector || self.raw_vector
       end
       
       # Use this to fetch the appropriate search vector in normalized form.
       def search_norm
-        @lsi_norm || @raw_norm
+        self.lsi_norm || self.raw_norm
       end
       
       # Creates the raw vector using all words in the classifier as the
@@ -171,11 +188,11 @@ module Classifier
         end
         
         if $GSL
-          @raw_norm   = vec.normalize
-          @raw_vector = vec
+          self.raw_norm   = vec.normalize
+          self.raw_vector = vec
         else
-          @raw_norm   = Vector[*vec].normalize
-          @raw_vector = Vector[*vec]
+          self.raw_norm   = Vector[*vec].normalize
+          self.raw_vector = Vector[*vec]
         end
       end
       

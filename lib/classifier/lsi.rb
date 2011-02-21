@@ -307,8 +307,9 @@ module Classifier
       end
       
       arr = node.lsi_vector.to_a
-      top_n = arr.sort.reverse[0..count-1]
-      return top_n.collect { |x| @word_list.word_for_index(arr.index(x))}
+      arr.sort.reverse[0..count-1].map { |x|
+        @word_list.word_for_index arr.index(x)
+      }
     end
 
     private

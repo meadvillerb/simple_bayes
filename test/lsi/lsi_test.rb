@@ -121,6 +121,15 @@ class LSITest < Test::Unit::TestCase
     assert_equal lsi_m.find_related(@str1, 3), lsi.find_related(@str1, 3)
   end
 =end
+
+  def test_database_file
+    lsi = Classifier::LSI.new db: "test/testdb.sqlite"
+    [@str1, @str2, @str3, @str4, @str5].each { |x| lsi << x }
+    
+    assert_equal lsi.items( @str1 ).content, @str1
+  ensure
+    File.delete "test/testdb.sqlite"
+  end
   
   def test_keyword_search
     lsi = Classifier::LSI.new

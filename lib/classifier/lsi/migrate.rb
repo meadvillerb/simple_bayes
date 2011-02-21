@@ -8,6 +8,12 @@ module Classifier
         primary_key :id
         String :retrieval_key, :unique => true, :null => false
         Text :source, :null => false
+        
+        Text :raw_vector
+        Text :raw_norm
+        Text :lsi_vector
+        Text :lsi_norm
+        
         index :retrieval_key
       end
       
