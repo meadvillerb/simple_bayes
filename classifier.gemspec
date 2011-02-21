@@ -23,6 +23,9 @@ Gem::Specification.new do |s|
   s.add_dependency('gsl', '>= 1.1.0')
   s.requirements << "A math library to speed up LSI classification."
   
+  s.add_dependency('sqlite3', '~> 1.3')
+  s.requirements << "Database adapter for persisting LSI data."
+  
   s.add_dependency('sequel', '~> 3.2')
   s.requirements << "ORM for persisting LSI data."
 end
