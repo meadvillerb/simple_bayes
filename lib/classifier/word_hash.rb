@@ -21,9 +21,9 @@ module Classifier
     #   just stemmed words
     def initialize( source, clean_source=true )
       super()
-    
+      
       populate_with( clean_source ?
-        source.gsub(/[^\w\s]/,"").split :
+        strip_punctuation(source).gsub(/[^\w\s]/,"").split :
         source.gsub(/[^\w\s]/,"").split + source.gsub(/[\w]/," ").split
       )
     end
