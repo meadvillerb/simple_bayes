@@ -16,8 +16,7 @@ The goal is to reduce memory usage and make it possible to classify very large n
 **New features:**
 
 * LSI can persist itself using [Sequel](http://sequel.rubyforge.org/). Pass a `:db` option to LSI::Classifier.new to specify a file path; otherwise, an in-memory database will be used.
-* There is no support yet for loading an existing database file and reusing the classifier.
-* Memory usage is reduced from >2 GB to ~250 MB.
+* Memory usage is significantly reduced. Building an index for lots of large texts, however, still consumes a fair bit of RAM, but it is stable and approximately 1/3 of previous.
 
 **Syntax/usage changes:**
 
