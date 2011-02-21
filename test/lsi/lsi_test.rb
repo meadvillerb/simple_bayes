@@ -132,5 +132,16 @@ class LSITest < Test::Unit::TestCase
   
     assert_equal ["dog", "text", "deal"], lsi.highest_ranked_stems(@str1)
   end
+  
+  def test_highest_relative_content
+    lsi = Classifier::LSI.new
+    lsi.add_item @str1, "Dog"
+    lsi.add_item @str2, "Dog"
+    lsi.add_item @str3, "Cat"
+    lsi.add_item @str4, "Cat"
+    lsi.add_item @str5, "Bird"
+  
+    puts lsi.highest_relative_content(2)
+  end
     
 end
