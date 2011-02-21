@@ -29,7 +29,9 @@ class LSITest < Test::Unit::TestCase
     lsi = Classifier::LSI.new :auto_rebuild => false
     lsi.add_item @str1, "Dog"
     lsi.add_item @str2, "Dog"
-    assert lsi.needs_rebuild?
+
+    assert lsi.needs_rebuild?, lsi.auto_rebuild.inspect
+    
     lsi.build_index
     assert ! lsi.needs_rebuild?
   end

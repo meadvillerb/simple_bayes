@@ -30,7 +30,6 @@ module Classifier
   # Wikipedia[http://en.wikipedia.org/wiki/Latent_Semantic_Indexing].
   class LSI
     attr_reader   :db, :word_list
-    attr_accessor :auto_rebuild
     
     # Create a fresh index.
     # If you want to call #build_index manually, use
@@ -47,10 +46,11 @@ module Classifier
       
       @db = Sequel.sqlite(options[:db])
       migrate
-      
-      self.auto_rebuild = true unless options[:auto_rebuild] == false
+
       self.version = 0
-      self.built_at_version = -1
+      self.built_at_version = -1      
+      self.auto_rebuild = options.has_key?(:auto_rebuild) ? 
+        options[:auto_rebuild] : true
       
       @nodes = []
       @word_list = WordList.new(self)
@@ -67,18 +67,13 @@ module Classifier
       define_method setting do
         val =
           instance_variable_get("@#{setting}") ||
-          @db[:settings].filter(:name => setting.to_s).map { |r| r[:val] }
+          @db[:settings].filter(:name => setting.to_s).map { |r| r[:val] }.first
         
-        setting == :auto_rebuild ? val || val == 1 : val
+        setting == :auto_rebuild && val.is_a?(Fixnum) ? val == 1 : val
       end
       
       define_method "#{setting}=" do |val|
-        if setting == :auto_rebuild
-          ins = val ? 1 : 0
-        else
-          ins = val
-        end
-        
+        ins = setting == :auto_rebuild ? (val ? 1 : 0) : val
         filter = { :name => setting.to_s }
         
         if @db[:settings].filter(filter).count > 0
@@ -121,7 +116,7 @@ module Classifier
       @nodes << node
       
       self.version += 1
-      build_index if @auto_rebuild
+      build_index if self.auto_rebuild
       
       node
     end

@@ -10,7 +10,7 @@ module Classifier
         primary_key :id
 
         String  :name, :unique => true, :null => false
-        Integer :val, :null => false
+        Integer :val
       end
       
       @db.create_table :content_nodes do
