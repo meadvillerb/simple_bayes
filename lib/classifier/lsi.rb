@@ -309,7 +309,7 @@ module Classifier
       tda = @nodes.map { |node| node.generate_raw_vector }
       
       u, v, s =
-        ($GSL ? GSL::Matrix.alloc(*tda) : Matrix.rows(tda)).trans.SV_decomp
+        ( $GSL ? GSL::Matrix.alloc(*tda) : Matrix.rows(tda) ).trans.SV_decomp
       
       # TODO: Better than 75% term, please. :\
       s_cutoff = s.sort.reverse[(s.size * cutoff).round - 1]
