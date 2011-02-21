@@ -37,9 +37,8 @@ module Classifier
       def self.destroy(db, key)
         return unless record = find(db, key)
         
-        record_id = record[:id]
         filter(db, :retrieval_key => key).delete
-        record_id
+        key
       end
       
       # Options:
