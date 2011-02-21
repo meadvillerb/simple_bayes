@@ -6,6 +6,13 @@ module Classifier
       
       return if @db["SELECT name FROM sqlite_master WHERE type='table'"].any?
       
+      @db.create_table :settings do
+        primary_key :id
+
+        String  :name, :unique => true, :null => false
+        Integer :val, :null => false
+      end
+      
       @db.create_table :content_nodes do
         primary_key :id
         String :retrieval_key, :unique => true, :null => false

@@ -187,13 +187,8 @@ module Classifier
             vec.map! { |val| Math.log( val + 1 ) / -weighted_t }
           end
         
-          if $GSL
-            self.raw_norm   = vec.normalize
-            self.raw_vector = vec
-          else
-            self.raw_norm   = Vector[*vec].normalize
-            self.raw_vector = Vector[*vec]
-          end
+          self.raw_norm   = $GSL ? vec.normalize : Vector[*vec].normalize
+          self.raw_vector = $GSL ? vec : Vector[*vec]
         }
       end
       

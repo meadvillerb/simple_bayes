@@ -41,15 +41,16 @@ module Classifier
     #
     # TODO: Recreate from an existing database.
     def initialize(options = {})
-      @auto_rebuild = true unless options[:auto_rebuild] == false
-      @version, @built_at_version = 0, -1
-      
       if options[:db] && File.exists?(options[:db])
         raise "Database file already exists at #{options[:db]}"
       end
       
       @db = Sequel.sqlite(options[:db])
       migrate
+      
+      self.auto_rebuild = true unless options[:auto_rebuild] == false
+      self.version = 0
+      self.built_at_version = -1
       
       @nodes = []
       @word_list = WordList.new(self)
@@ -59,7 +60,35 @@ module Classifier
     # to be built after all informaton is added, but before you start
     # using it for search, classification and cluster detection.
     def needs_rebuild?
-      @db[:content_nodes].count > 1 && @version != @built_at_version
+      @db[:content_nodes].count > 1 && self.version != self.built_at_version
+    end
+    
+    [:version, :built_at_version, :auto_rebuild].each do |setting|
+      define_method setting do
+        val =
+          instance_variable_get("@#{setting}") ||
+          @db[:settings].filter(:name => setting.to_s).map { |r| r[:val] }
+        
+        setting == :auto_rebuild ? val || val == 1 : val
+      end
+      
+      define_method "#{setting}=" do |val|
+        if setting == :auto_rebuild
+          ins = val ? 1 : 0
+        else
+          ins = val
+        end
+        
+        filter = { :name => setting.to_s }
+        
+        if @db[:settings].filter(filter).count > 0
+          @db[:settings].filter(filter).update :val => ins
+        else
+          @db[:settings].insert filter.merge(:val => ins)
+        end
+        
+        instance_variable_set("@#{setting}", val)
+      end
     end
     
     # List all items or find a specific item by its key.
@@ -91,7 +120,7 @@ module Classifier
       node = ContentNode.new( self, item, options )
       @nodes << node
       
-      @version += 1
+      self.version += 1
       build_index if @auto_rebuild
       
       node
@@ -106,7 +135,7 @@ module Classifier
     
     # Removes an item from the database, if it is indexed.
     def remove_item( item_key )
-      @version += @nodes.delete( ContentNode.destroy(db, item_key) ) ? 1 : 0
+      self.version += @nodes.delete( ContentNode.destroy(db, item_key) ) ? 1 : 0
     end
     
     # Return all categories in this classifier.
@@ -156,7 +185,7 @@ module Classifier
         end
       end
       
-      @built_at_version = @version
+      self.built_at_version = self.version
     end
     
     # This method returns max_chunks entries, ordered by their average semantic 

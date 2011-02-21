@@ -15,6 +15,10 @@ class LSITest < Test::Unit::TestCase
     lsi = Classifier::LSI.new
     [@str1, @str2, @str3, @str4, @str5].each { |x| lsi << x }
     assert ! lsi.needs_rebuild?
+    
+    assert lsi.auto_rebuild
+    assert_equal 5, lsi.version
+    assert_equal 5, lsi.built_at_version
 
     # note that the closest match to str1 is str2, even though it is not
     # the closest text match.
