@@ -141,7 +141,7 @@ class LSITest < Test::Unit::TestCase
     lsi.add_item @str4, "Cat"
     lsi.add_item @str5, "Bird"
   
-    puts lsi.highest_relative_content(2)
+    assert_equal [@str2, @str4], lsi.highest_relative_content(2)
   end
     
 end

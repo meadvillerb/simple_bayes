@@ -189,7 +189,7 @@ module Classifier
       
       avg_density.keys.
         sort_by { |key| avg_density[key] }.
-        map { |key| items(key).content }
+        map { |key| items(key).content }.
         reverse[0..max-1]
     end
 
