@@ -12,22 +12,33 @@ class LSITest < Test::Unit::TestCase
   end
   
   def test_basic_indexing
-   lsi = Classifier::LSI.new
+    lsi = Classifier::LSI.new
     [@str1, @str2, @str3, @str4, @str5].each { |x| lsi << x }
     assert ! lsi.needs_rebuild?
-    
-   # note that the closest match to str1 is str2, even though it is not
-   # the closest text match.
-   assert_equal [@str2, @str5, @str3], lsi.find_related(@str1, 3)
+
+    # note that the closest match to str1 is str2, even though it is not
+    # the closest text match.
+    assert_equal [@str2, @str5, @str3], lsi.find_related(@str1, 3)
   end
 
   def test_not_auto_rebuild
-   lsi = Classifier::LSI.new :auto_rebuild => false
-   lsi.add_item @str1, "Dog"
-   lsi.add_item @str2, "Dog"
-   assert lsi.needs_rebuild?
-   lsi.build_index
-   assert ! lsi.needs_rebuild?
+    lsi = Classifier::LSI.new :auto_rebuild => false
+    lsi.add_item @str1, "Dog"
+    lsi.add_item @str2, "Dog"
+    assert lsi.needs_rebuild?
+    lsi.build_index
+    assert ! lsi.needs_rebuild?
+  end
+  
+  def test_not_persisting_sample_nodes
+    lsi = Classifier::LSI.new
+    lsi.add_item @str1, "Dog"
+    lsi.add_item @str2, "Dog"
+    
+    count = lsi.db[:content_nodes].count
+    lsi.send :node_for_content, "My other string"
+    
+    assert_equal count, lsi.db[:content_nodes].count
   end
 
   def test_basic_categorizing
@@ -37,9 +48,11 @@ class LSITest < Test::Unit::TestCase
     lsi.add_item @str4, "Cat"
     lsi.add_item @str5, "Bird"
     
+    assert_equal lsi.categories, ["Bird", "Cat", "Dog"]
+    
     assert_equal "Dog", lsi.classify( @str1 )
     assert_equal "Cat", lsi.classify( @str3 )
-     assert_equal "Bird", lsi.classify( @str5 )  
+    assert_equal "Bird", lsi.classify( @str5 )
   end
   
   def test_external_classifying
@@ -61,18 +74,18 @@ class LSITest < Test::Unit::TestCase
   
   def test_recategorize_interface
     lsi = Classifier::LSI.new
-    lsi.add_item @str1, "Dog"
-    lsi.add_item @str2, "Dog"
-    lsi.add_item @str3, "Cat"
-    lsi.add_item @str4, "Cat"
-    lsi.add_item @str5, "Bird"
+    lsi.add_item @str1, :categories => "Dog"
+    lsi.add_item @str2, :categories => "Dog"
+    lsi.add_item @str3, :categories => "Cat"
+    lsi.add_item @str4, :categories => "Cat"
+    lsi.add_item @str5, :categories => "Bird"
     
     tricky_case = "This text revolves around dogs."
     assert_equal "Dog", lsi.classify( tricky_case )
     
     # Recategorize as needed.
-    lsi.categories_for(@str1).clear.push "Cow"
-    lsi.categories_for(@str2).clear.push "Cow"
+    lsi.items(@str1).categories = "Cow"
+    lsi.items(@str2).categories = "Cow"
 
     assert !lsi.needs_rebuild?
     assert_equal "Cow", lsi.classify( tricky_case )   
@@ -95,6 +108,8 @@ class LSITest < Test::Unit::TestCase
                   lsi.search("dog", 5) )
   end
   
+  # This won't work anymore, due to the database.
+=begin
   def test_serialize_safe
     lsi = Classifier::LSI.new
     [@str1, @str2, @str3, @str4, @str5].each { |x| lsi << x }
@@ -105,6 +120,7 @@ class LSITest < Test::Unit::TestCase
     assert_equal lsi_m.search("cat", 3), lsi.search("cat", 3)
     assert_equal lsi_m.find_related(@str1, 3), lsi.find_related(@str1, 3)
   end
+=end
   
   def test_keyword_search
     lsi = Classifier::LSI.new
@@ -114,11 +130,7 @@ class LSITest < Test::Unit::TestCase
     lsi.add_item @str4, "Cat"
     lsi.add_item @str5, "Bird"
   
-    assert_equal [:dog, :text, :deal], lsi.highest_ranked_stems(@str1)
+    assert_equal ["dog", "text", "deal"], lsi.highest_ranked_stems(@str1)
   end
-  
-#  def test_summary
-#     assert_equal "This text involves dogs too [...] This text also involves cats", [@str1, @str2, @str3, @str4, @str5].join.summary(2)
-#  end
     
 end
