@@ -40,19 +40,17 @@ module Classifier
     #
     # TODO: Recreate from an existing database.
     def initialize(options = {})
-      if options[:db] && File.exists?(options[:db])
-        raise "Database file already exists at #{options[:db]}"
-      end
-      
       @db = Sequel.sqlite(options[:db])
       migrate
-
-      self.version = 0
-      self.built_at_version = -1      
-      self.auto_rebuild = options.has_key?(:auto_rebuild) ? 
-        options[:auto_rebuild] : true
       
-      @nodes = []
+      unless self.version
+        self.version = 0
+        self.built_at_version = -1
+        self.auto_rebuild = options.has_key?(:auto_rebuild) ? 
+          options[:auto_rebuild] : true
+      end
+      
+      @nodes = db[:content_nodes].all.map { |n| ContentNode.new self, n[:id] }
       @word_list = WordList.new(self)
     end
     

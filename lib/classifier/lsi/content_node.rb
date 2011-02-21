@@ -41,31 +41,37 @@ module Classifier
         key
       end
       
+      # Accepts a source string or a database id as the second argument.
+      # 
       # Options:
       #  - key (unique identifier)
       #  - categories (array)
       def initialize( lsi, source, options={} )
         @lsi = lsi
         
-        source = source.to_s
-        options[:persist] = true unless options.has_key?(:persist)
-        options[:categories] ||= []
-        options[:key] ||= source.to_s
-        
-        if options[:persist]
+        if source.is_a?(Fixnum) # load from database
+          @db_id = source
+        else # create a new node
           source = source.to_s
-          @db_id = db[:content_nodes].insert(
-            :source => source,
-            :retrieval_key => options[:key]
-          )
-        else
-          @db_id = nil
-          @source = source
-          @key = options[:key]
-        end
+          options[:persist] = true unless options.has_key?(:persist)
+          options[:categories] ||= []
+          options[:key] ||= source.to_s
         
-        self.categories = options[:categories]
-        self.words = source
+          if options[:persist]
+            source = source.to_s
+            @db_id = db[:content_nodes].insert(
+              :source => source,
+              :retrieval_key => options[:key]
+            )
+          else
+            @db_id = nil
+            @source = source
+            @key = options[:key]
+          end
+        
+          self.categories = options[:categories]
+          self.words = source
+        end
       end
       
       def id

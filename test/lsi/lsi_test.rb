@@ -137,6 +137,24 @@ class LSITest < Test::Unit::TestCase
     File.delete "test/testdb.sqlite"
   end
   
+  def test_reload_from_database_file
+    lsi = Classifier::LSI.new db: "test/testdb.sqlite"
+    [@str1, @str2, @str3, @str4, @str5].each { |x| lsi << x }
+    
+    assert_equal lsi.items( @str1 ).content, @str1
+    
+    lsi = nil
+    
+    lsi = Classifier::LSI.new db: "test/testdb.sqlite"
+    assert_equal 5, lsi.items.size
+    assert_equal lsi.items( @str1 ).content, @str1
+    assert ! lsi.needs_rebuild?
+    
+    assert_equal [@str2, @str5, @str3], lsi.find_related(@str1, 3)
+  ensure
+    File.delete "test/testdb.sqlite"
+  end
+  
   def test_keyword_search
     lsi = Classifier::LSI.new
     lsi.add_item @str1, "Dog"

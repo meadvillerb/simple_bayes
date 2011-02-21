@@ -3,8 +3,16 @@ module Classifier
   class LSI
     def migrate
       raise "No database defined!" unless @db
-      
-      return if @db["SELECT name FROM sqlite_master WHERE type='table'"].any?
+
+      table_query = "SELECT name FROM sqlite_master WHERE type='table'"
+      tables = @db[table_query].map { |t| t[:name] }
+      if tables.any?
+        missing =
+          %w(words word_lists categories categories_content_nodes) - tables
+        raise "Missing tables #{missing.join(", ")}" if missing.any?
+        
+        return
+      end
       
       @db.create_table :settings do
         primary_key :id
