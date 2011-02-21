@@ -209,7 +209,7 @@ module Classifier
       return [] if needs_rebuild?
       
       content_node = node_for_content( doc )
-      result = @nodes.collect do |node|
+      result = @nodes.map do |node|
         val = $GSL ?
           (content_node.search_vector * node.search_vector.col) :
           (Matrix[content_node.search_vector] * node.search_vector)[0]
