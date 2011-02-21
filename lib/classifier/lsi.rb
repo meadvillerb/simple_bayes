@@ -139,27 +139,27 @@ module Classifier
       return unless needs_rebuild?
       
       @nodes.each { |node| node.generate_raw_vector }
-      
-      tda = profile('Raw vectors') { @nodes.map { |node| node.raw_vector } }
       if $GSL
-        tdm = GSL::Matrix.alloc(*tda).trans
-        ntdm = profile('Matrix') { build_reduced_matrix(tdm, cutoff) }
+        matrix = profile('Matrix') {
+          build_reduced_matrix(@nodes.map { |node| node.raw_vector }, cutoff)
+        }
         
         profile('Vectors') {
-          ntdm.size[1].times do |col|
-            vec = GSL::Vector.alloc( ntdm.column(col) ).row
+          matrix.size[1].times do |col|
+            vec = GSL::Vector.alloc( matrix.column(col) ).row
             @nodes[col].lsi_vector = vec
             @nodes[col].lsi_norm = vec.normalize
           end
         }
       else
-        tdm = Matrix.rows(tda).trans
-        ntdm = build_reduced_matrix(tdm, cutoff)
+        matrix = profile('Matrix') {
+          build_reduced_matrix(@nodes.map { |node| node.raw_vector }, cutoff)
+        }
         
-        ntdm.row_size.times do |col|
+        matrix.row_size.times do |col|
           if @nodes[col]
-            @nodes[col].lsi_vector = ntdm.column(col)
-            @nodes[col].lsi_norm = ntdm.column(col).normalize
+            @nodes[col].lsi_vector = matrix.column(col)
+            @nodes[col].lsi_norm = matrix.column(col).normalize
           end
         end
       end
@@ -313,15 +313,15 @@ module Classifier
 
     private
     
-    def build_reduced_matrix( matrix, cutoff=0.75 )
-      # TODO: Check that M>=N on these dimensions! Transpose helps assure this
-      u, v, s = matrix.SV_decomp
-
+    def build_reduced_matrix( tda, cutoff=0.75 )
+      u, v, s = $GSL ?
+        GSL::Matrix.alloc(*tda).trans.SV_decomp :
+        Matrix.rows(tda).trans.SV_decomp
+      
       # TODO: Better than 75% term, please. :\
       s_cutoff = s.sort.reverse[(s.size * cutoff).round - 1]
-      s.size.times do |ord|
-        s[ord] = 0.0 if s[ord] < s_cutoff
-      end
+      s.size.times { |ord| s[ord] = 0.0 if s[ord] < s_cutoff }
+      
       # Reconstruct the term document matrix, only with reduced rank
       u * ($GSL ? GSL::Matrix : ::Matrix).diag( s ) * v.trans
     end

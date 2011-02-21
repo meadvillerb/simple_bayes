@@ -163,7 +163,7 @@ module Classifier
       # Creates the raw vector using all words in the classifier as the
       # key for mapping the vector space.
       def generate_raw_vector
-        lsi.send(:profile, "Generate raw vector for #{@db_id}") {
+        lsi.send(:profile, "Generate raw vector for #{@db_id || 'new node'}") {
           vec = $GSL ?
             GSL::Vector.alloc(lsi_words.size) : Array.new(lsi_words.size, 0)
           

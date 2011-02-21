@@ -16,12 +16,14 @@ module Classifier
         Text :lsi_vector
         Text :lsi_norm
         
+        index :id
         index :retrieval_key
       end
       
       @db.create_table :words do
         primary_key :id
-        String :stem, :unique => true, :null => false        
+        String :stem, :unique => true, :null => false
+        
         index :stem
       end
       
@@ -38,6 +40,7 @@ module Classifier
       @db.create_table :categories do
         primary_key :id
         String :name, :unique => true, :null => false
+        
         index :name
       end
       
@@ -45,6 +48,9 @@ module Classifier
         primary_key :id
         foreign_key :category_id, :categories
         foreign_key :content_node_id, :content_nodes
+        
+        index :category_id
+        index :content_node_id
       end
     end
   end
