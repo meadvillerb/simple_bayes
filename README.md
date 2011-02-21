@@ -21,7 +21,8 @@ The goal is to reduce memory usage and make it possible to classify very large n
 
 **Syntax/usage changes:**
 
-* An LSI instance can no longer be marshalled.
+* Clean word hashes now exclude words that mix letters and numbers, and strip all punctuation including underscores.
+* LSI instances can no longer be marshalled.
 * LSI no longer supports passing content as a block, because I couldn't see a  use-case.
 * LSI no longer supports manipulating an item's categories as an array.
 
