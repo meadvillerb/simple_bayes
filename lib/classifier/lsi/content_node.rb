@@ -166,14 +166,14 @@ module Classifier
         lsi.send(:profile, "Generate raw vector for #{@db_id}") {
           vec = $GSL ?
             GSL::Vector.alloc(lsi_words.size) : Array.new(lsi_words.size, 0)
-        
+          
           words.each do |word, frequency|
             vec[ lsi_words[word] ] = frequency if lsi_words.includes?(word)
           end
-        
+          
           # Perform the scaling transform
           total_words = vec.sum
-        
+          
           # Perform first-order association transform if this vector has more
           # than one word in it. 
           if total_words > 1.0

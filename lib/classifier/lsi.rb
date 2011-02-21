@@ -44,6 +44,10 @@ module Classifier
       @auto_rebuild = true unless options[:auto_rebuild] == false
       @version, @built_at_version = 0, -1
       
+      if options[:db] && File.exists?(options[:db])
+        raise "Database file already exists at #{options[:db]}"
+      end
+      
       @db = Sequel.sqlite(options[:db])
       migrate
       
@@ -134,10 +138,9 @@ module Classifier
     def build_index( cutoff=0.75 )
       return unless needs_rebuild?
       
-      tda = profile('Raw vectors') {
-        @nodes.collect { |node| node.generate_raw_vector }
-      }
+      @nodes.each { |node| node.generate_raw_vector }
       
+      tda = profile('Raw vectors') { @nodes.map { |node| node.raw_vector } }
       if $GSL
         tdm = GSL::Matrix.alloc(*tda).trans
         ntdm = profile('Matrix') { build_reduced_matrix(tdm, cutoff) }
