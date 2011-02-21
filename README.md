@@ -16,17 +16,18 @@ The goal is to reduce memory usage and make it possible to classify very large n
 **New features:**
 
 * LSI can persist itself using [Sequel](http://sequel.rubyforge.org/). Pass a `:db` option to LSI::Classifier.new to specify a file path; otherwise, an in-memory database will be used.
-* Memory usage is significantly reduced. Building an index for lots of large texts, however, still consumes a fair bit of RAM, but it is stable and approximately 1/3 of previous.
+* Memory usage is significantly reduced. Building an index for lots of large texts, however, still consumes a fair bit of RAM, but approximately 1/3 of previous.
 
 **Syntax/usage changes:**
 
 * Clean word hashes now exclude words that mix letters and numbers, and strip all punctuation including underscores.
-* LSI instances can no longer be marshalled.
+* LSI instances can no longer be marshalled. Use database persistence instead.
 * LSI no longer supports passing content as a block, because I couldn't see a  use-case.
 * LSI no longer supports manipulating an item's categories as an array.
 
 **Todo:**
 
+* Enable flexible rules for word stemming / inclusion. e.g. Pass a block to WordHash to determine a valid word.
 * Speed. The goal here is to persist everything that's not in use, because the matrices alone consume huge amounts of RAM. However, this means that many operations are slower than when all of the data is in RAM (it's faster than paging, though!). Is it possible to use the database's native functions at all to speed things up?
 * Reduce matrix memory consumption. `build_reduced_matrix` immediately chews up 100s of MBs.
 

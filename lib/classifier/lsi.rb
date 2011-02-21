@@ -36,9 +36,8 @@ module Classifier
     #    Classifier::LSI.new :auto_rebuild => false
     # 
     # If you want to work with data on disk in an sqlite database, pass the
-    # absolute path to a .sqlite file as options[:db].
-    #
-    # TODO: Recreate from an existing database.
+    # absolute path to a .sqlite file as options[:db]. Note that you need
+    # to handle deleting an invalid file yourself in a rescue block.
     def initialize(options = {})
       @db = Sequel.sqlite(options[:db])
       migrate
@@ -50,7 +49,9 @@ module Classifier
           options[:auto_rebuild] : true
       end
       
-      @nodes = db[:content_nodes].all.map { |n| ContentNode.new self, n[:id] }
+      @nodes = db[:content_nodes].select(:id).all.map { |n|
+        ContentNode.new self, n[:id]
+      }
       @word_list = WordList.new(self)
     end
     

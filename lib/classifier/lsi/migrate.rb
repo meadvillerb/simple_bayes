@@ -11,7 +11,7 @@ module Classifier
           %w(words word_lists categories categories_content_nodes settings) -
           tables
         
-        raise "Missing tables #{missing.join(", ")}" if missing.any?
+        raise "Missing tables (#{missing.join(", ")})" if missing.any?
         return
       end
       
