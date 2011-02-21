@@ -8,7 +8,9 @@ module Classifier
       tables = @db[table_query].map { |t| t[:name] }
       if tables.any?
         missing =
-          %w(words word_lists categories categories_content_nodes) - tables
+          %w(words word_lists categories categories_content_nodes settings) -
+          tables
+        
         raise "Missing tables #{missing.join(", ")}" if missing.any?
         return
       end
