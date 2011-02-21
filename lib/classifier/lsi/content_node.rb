@@ -84,8 +84,7 @@ module Classifier
       # The record's unique key, or the original text if no key was provided.
       def key
         @key || record[:retrieval_key]
-      end
-      
+      end      
       alias :to_s :key
       
       # The original text.
@@ -93,7 +92,6 @@ module Classifier
         @source || record[:source]
       end
       
-      # List all categories for this node.
       def categories
         (@categories || category_records.map { |c| c[:name] }).sort
       end

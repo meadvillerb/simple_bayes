@@ -178,20 +178,19 @@ module Classifier
     # information on what your dataset is generally about.
     #
     # TODO: may not work with new system
-    def highest_relative_content( max_chunks=10 )
+    def highest_relative_content( max=10 )
       return [] if needs_rebuild?
       
       avg_density = Hash.new
-      @nodes.each_key do |x|
-        avg_density[x] = proximity_array_for_content(x).inject(0.0) { |y,z|
-          y + z[1]
-        }
+      @nodes.each do |node|
+        avg_density[node.key] =
+          proximity_array_for_content(node.content).inject(0.0) { |y,z| y+z[1] }
       end
       
       avg_density.keys.
-        sort_by { |x| avg_density[x] }.
-        reverse[0..max_chunks-1].
-        map
+        sort_by { |key| avg_density[key] }.
+        map { |key| items(key).content }
+        reverse[0..max-1]
     end
 
     # This function is the primitive that find_related and classify 
