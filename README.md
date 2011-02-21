@@ -26,6 +26,11 @@ The goal is to reduce memory usage and make it possible to classify very large n
 * LSI no longer supports passing content as a block, because I couldn't see a  use-case.
 * LSI no longer supports manipulating an item's categories as an array.
 
+**Todo:**
+
+* Speed. The goal here is to persist everything that's not in use, because the matrices alone consume huge amounts of RAM. However, this means that many operations are slower than when all of the data is in RAM. Is it possible to use the database's native functions at all to speed things up?
+* Reduce matrix memory consumption. `build_reduced_matrix` immediately chews up 100s of MBs.
+
 The existing tests pass, but if you find any new bugs or strange behaviour, please create a pull request.
 
 Download

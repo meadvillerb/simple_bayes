@@ -138,12 +138,8 @@ module Classifier
     def build_index( cutoff=0.75 )
       return unless needs_rebuild?
       
-      @nodes.each { |node| node.generate_raw_vector }
+      matrix = profile('Matrix') { build_reduced_matrix(cutoff) }
       if $GSL
-        matrix = profile('Matrix') {
-          build_reduced_matrix(@nodes.map { |node| node.raw_vector }, cutoff)
-        }
-        
         profile('Vectors') {
           matrix.size[1].times do |col|
             vec = GSL::Vector.alloc( matrix.column(col) ).row
@@ -152,10 +148,6 @@ module Classifier
           end
         }
       else
-        matrix = profile('Matrix') {
-          build_reduced_matrix(@nodes.map { |node| node.raw_vector }, cutoff)
-        }
-        
         matrix.row_size.times do |col|
           if @nodes[col]
             @nodes[col].lsi_vector = matrix.column(col)
@@ -313,7 +305,9 @@ module Classifier
 
     private
     
-    def build_reduced_matrix( tda, cutoff=0.75 )
+    def build_reduced_matrix( cutoff=0.75 )
+      tda = @nodes.map { |node| node.generate_raw_vector }
+      
       u, v, s =
         ($GSL ? GSL::Matrix.alloc(*tda) : Matrix.rows(tda)).trans.SV_decomp
       
