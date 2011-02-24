@@ -190,8 +190,6 @@ module Classifier
     # information about your dataset's general content. For example, if you were 
     # to use categorize on the results of this data, you could gather
     # information on what your dataset is generally about.
-    #
-    # TODO: may not work with new system
     def highest_relative_content( max=10 )
       return [] if needs_rebuild?
       
@@ -293,7 +291,6 @@ module Classifier
     # cutoff signifies the number of documents to consider when clasifying 
     # text. A cutoff of 1 means that every document in the index votes on 
     # what category the document is in. This may not always make sense.
-    #
     def classify( doc, cutoff=0.30 )
       icutoff = (@nodes.size * cutoff).round
       carry = proximity_array_for_content( doc )[0..icutoff-1]
@@ -330,7 +327,6 @@ module Classifier
     
     def build_reduced_matrix( cutoff=0.75 )
       tda = @nodes.map { |node| node.generate_raw_vector }
-      
       u, v, s =
         ( $GSL ? GSL::Matrix.alloc(*tda) : Matrix.rows(tda) ).trans.SV_decomp
       
