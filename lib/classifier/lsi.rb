@@ -229,7 +229,7 @@ module Classifier
         [node.key, val]
       end
       
-      result.sort_by { |x| x[1] }.reverse
+      result.sort_by { |x| !x[1].nan? ? x[1] : 100_000_000 }.reverse
     end
     
     # Similar to proximity_array_for_content, this function takes similar
@@ -249,7 +249,7 @@ module Classifier
         [node.key, val]
       end
       
-      result.sort_by { |x| x[1] }.reverse
+      result.sort_by { |x| !x[1].nan? ? x[1] : 100_000_000 }.reverse
     end 
 
     # This function allows for text-based search of your index. Unlike other 
