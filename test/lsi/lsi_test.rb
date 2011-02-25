@@ -97,6 +97,26 @@ class LSITest < Test::Unit::TestCase
     assert_equal "Cow", lsi.classify( tricky_case )   
   end
   
+  def test_remove_item
+    lsi = Classifier::LSI.new
+    lsi.add_item @str1, :categories => "Dog", key: 5
+    lsi.add_item @str2, :categories => "Dog"
+    lsi.add_item @str3, :categories => "Cat"
+    lsi.add_item @str4, :categories => "Cat"
+    lsi.add_item @str5, :categories => "Bird"
+        
+    # Recategorize as needed.
+    assert_equal 5, lsi.items.size
+    
+    lsi.remove_item 5
+    assert_equal 4, lsi.items.size
+    
+    lsi.remove_item @str2
+    assert_equal 3, lsi.items.size
+    
+    assert !lsi.needs_rebuild?
+  end
+  
   def test_search
     lsi = Classifier::LSI.new
     [@str1, @str2, @str3, @str4, @str5].each { |x| lsi << x }

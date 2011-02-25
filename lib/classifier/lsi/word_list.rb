@@ -11,6 +11,14 @@ module Classifier
       @lsi = lsi
     end
     
+    def update_dimensions
+      i = 0
+      db[:words].all.each do |word|
+        db[:words].where(:id => word[:id]).update(:dimension => i)
+        i += 1
+      end
+    end
+    
     # List all categories in the database.
     def categories
       db[:categories].all.map { |c| c[:name] }.sort
@@ -23,13 +31,12 @@ module Classifier
     
     # Returns the dimension of the word or nil if the word is not in the space.
     def [](word)
-      db[:words].filter(:stem => word).first[:id] - 1 if includes?(word)
+      db[:words].filter(:stem => word).first[:dimension] if includes?(word)
     end
     
     def word_for_index(dimension)
-      if dimension + 1 < word_count
-        db[:words].filter(:id => dimension + 1).first[:stem]
-      end
+      word = db[:words].filter(:dimension => dimension).first
+      word ? word[:stem] : nil
     end
     
     def includes?(word)

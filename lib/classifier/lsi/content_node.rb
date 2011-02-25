@@ -33,14 +33,6 @@ module Classifier
         find_by_content(db, content).map { |n| n[:retrieval_key] }.first
       end
       
-      # Removes the node and returns its old ID.
-      def self.destroy(db, key)
-        return unless record = find(db, key)
-        
-        filter(db, :retrieval_key => key).delete
-        key
-      end
-      
       # Accepts a source string or a database id as the second argument.
       # 
       # Options:
@@ -80,6 +72,27 @@ module Classifier
       
       def persisted?
         !!@db_id
+      end
+      
+      def destroy
+        word_ids = word_records.map { |word| word[:word_id] }
+        category_ids = category_records.map { |cat| cat[:category_id] }
+        
+        db[:categories_content_nodes].filter(:content_node_id => self.id).delete
+        db[:word_lists].filter(:content_node_id => self.id).delete
+        
+        word_ids = word_ids.select { |word_id|
+          db[:word_lists].filter(:word_id => word_id).count === 0
+        }
+        db[:words].filter(:id => word_ids).delete
+        
+        category_ids = category_ids.select { |category_id|
+          db[:categories_content_nodes].
+            filter(:category_id => category_id).count === 0
+        }
+        db[:categories].filter(:id => category_ids).delete
+        
+        ContentNode.filter(db, :id => @db_id).delete
       end
       
       # The database record associated with this node.

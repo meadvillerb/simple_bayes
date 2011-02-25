@@ -129,7 +129,18 @@ module Classifier
     
     # Removes an item from the database, if it is indexed.
     def remove_item( item_key )
-      self.version += @nodes.delete( ContentNode.destroy(db, item_key) ) ? 1 : 0
+      node = nil
+      idx = nil
+      
+      @nodes.each { |n| node = n if n.key == item_key.to_s }
+      
+      raise "Could not find node for #{item_key}" unless node
+      
+      node.destroy
+      @nodes.delete(node)
+      
+      self.version += 1
+      build_index if self.auto_rebuild
     end
     
     # Return all categories in this classifier.
@@ -160,6 +171,8 @@ module Classifier
     # turning the LSI class into a simple vector search engine.
     def build_index( cutoff=0.75 )
       return unless needs_rebuild?
+      
+      word_list.update_dimensions
       
       matrix = profile('Matrix') { build_reduced_matrix(cutoff) }
       if $GSL

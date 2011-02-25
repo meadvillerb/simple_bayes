@@ -39,6 +39,7 @@ module Classifier
       @db.create_table :words do
         primary_key :id
         String :stem, :unique => true, :null => false
+        Integer :dimension
         
         index :stem
       end

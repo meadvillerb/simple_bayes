@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    classifier (1.4.1)
+    classifier (1.4.2)
       fast-stemmer (>= 1.0.0)
       gsl (>= 1.1.0)
       sequel (~> 3.2)
@@ -11,7 +11,7 @@ GEM
   remote: http://rubygems.org/
   specs:
     fast-stemmer (1.0.0)
-    gsl (1.14.5)
+    gsl (1.14.6)
       narray (>= 0.5.9)
     narray (0.5.9.9)
     sequel (3.20.0)
