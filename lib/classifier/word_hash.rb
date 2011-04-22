@@ -8,21 +8,27 @@
 # This class wraps Hash instead of adding methods to String, to avoid
 # extending the core class too much.
 
-require 'fast_stemmer'
+require 'lingua/stemmer'
 
 module Classifier
   
   class WordHash < Hash
+
+    attr_accessor :stemmer
     # Create a hash of strings => ints. Each word in the string is stemmed
     # and indexed to its frequency in the document.
     #
     # clean_source (bool):
     #   Return a word hash without extra punctuation or short symbols,
     #   just stemmed words
-    def initialize( source, clean_source=true )
+    def initialize(source, options = {})
       super()
-      
-      populate_with( clean_source ?
+      options = {
+        :clean_source => true,
+        :stemmer_language => 'en'
+      }.merge(options)
+      self.stemmer = Lingua::Stemmer.new(:language => options[:stemmer_language])
+      populate_with( options[:clean_source] ?
         strip_punctuation(source).gsub(/[^\w\s]/,"").split :
         source.gsub(/[^\w\s]/,"").split + source.gsub(/[\w]/," ").split
       )
@@ -35,7 +41,7 @@ module Classifier
       words.each do |word|
         word.downcase! if word =~ /[\w]+/
         if valid?( word )
-          key = word.stem
+          key = self.stemmer.stem(word)
           self[key] ||= 0
           self[key] += 1
         end

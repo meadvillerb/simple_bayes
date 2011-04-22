@@ -17,9 +17,9 @@ Gem::Specification.new do |s|
   s.require_path = 'lib'
 #  s.rubyforge_project = '[none]'
 
-  s.add_dependency('fast-stemmer', '>= 1.0.0')
-  s.requirements << "A porter-stemmer module to split word stems."
-  
+  s.add_dependency('ruby-stemmer', '>= 0.9.1')
+  s.requirements << "A stemmer module to split word stems."
+
   s.add_dependency('gsl', '>= 1.1.0')
   s.requirements << "A math library to speed up LSI classification."
   

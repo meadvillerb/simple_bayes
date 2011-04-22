@@ -25,7 +25,7 @@ class Bayes
   #     b.train "The other", "The other text"
   def train(category, text)
     category = prepare_category_name(category)
-    WordHash.new(text, false).each do |word, count|
+    WordHash.new(text, :clean_source => false).each do |word, count|
       @categories[category][word]     ||=     0
       @categories[category][word]      +=     count
       @total_words += count
@@ -42,7 +42,7 @@ class Bayes
   #     b.untrain :this, "This text"
   def untrain(category, text)
     category = prepare_category_name(category)
-    WordHash.new(text, false).each do |word, count|
+    WordHash.new(text, :clean_source => false).each do |word, count|
       if @total_words >= 0
         orig = @categories[category][word]
         @categories[category][word]     ||=     0
@@ -66,7 +66,7 @@ class Bayes
     @categories.each do |category, category_words|
       score[category.to_s] = 0
       total = category_words.values.inject(0) {|sum, element| sum+element}
-      WordHash.new(text, false).each do |word, count|
+      WordHash.new(text, :clean_source => false).each do |word, count|
         s = category_words.has_key?(word) ? category_words[word] : 0.1
         score[category.to_s] += Math.log(s/total.to_f)
       end
