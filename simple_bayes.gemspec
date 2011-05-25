@@ -6,11 +6,11 @@ require 'simple_bayes/version'
 Gem::Specification.new do |s|
   s.name         = "simple_bayes"
   s.version      = SimpleBayes::VERSION
-  s.authors      = ["Ezekiel Templin", "Lucas Carlson"]
+  s.authors      = ["Lucas Carlson", "Ezekiel Templin", "Nick Ragaz", "Leo Soto", "Kyle Goodwin"]
   s.email        = "ezkl@me.com"
   s.homepage     = "http://github.com/ezkl/simple_bayes"
-  s.summary      = "Bayesian and LSI classification in Ruby."
-  s.description  = "Classifier is a general module to allow Bayesian and other types of classifications. Forked at nragaz/classifier from cardmagic/classifier."
+  s.summary      = "A Bayes-centric, slim fork of Lucas Carlson's classifier library."
+  s.description  = "A Bayes-centric, slim fork of Lucas Carlson's classifier library including work from Nick Ragaz, Leo Soto, and Kyle Goodwin."
 
   s.files        = `git ls-files lib`.split("\n")
   s.platform     = Gem::Platform::RUBY
