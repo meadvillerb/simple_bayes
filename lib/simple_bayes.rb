@@ -24,6 +24,11 @@
 # Copyright:: Copyright (c) 2005 Lucas Carlson
 # License::   LGPL
 
+require 'lingua/stemmer'
+
+
 require 'simple_bayes/version'
 require 'simple_bayes/word_hash'
 require 'simple_bayes/bayes'
+
+module SimpleBayes; end

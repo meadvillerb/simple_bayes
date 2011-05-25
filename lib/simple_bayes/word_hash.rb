@@ -9,8 +9,6 @@
 # This class wraps Hash instead of adding methods to String, to avoid
 # extending the core class too much.
 
-require 'lingua/stemmer'
-
 module SimpleBayes
   
   class WordHash < Hash

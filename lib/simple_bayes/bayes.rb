@@ -4,7 +4,7 @@
 
 module SimpleBayes
 
-class Bayes
+class << self
 
   attr_accessor :stemmer_language
   # The class can be created with one or more categories, each of which will be
