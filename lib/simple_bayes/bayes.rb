@@ -14,6 +14,7 @@ module SimpleBayes
     def initialize(*categories)
       @categories = Hash.new
 
+      @word_totals = Hash.new { |h,k| h[k] = 0 }
       categories.each do |category|
         @categories[category] = Hash.new { |h,k| h[k] = 0 }
       end
@@ -32,6 +33,7 @@ module SimpleBayes
       WordHash.new(text).each do |word, count|
         @categories[category][word] +=     count
         @total_words += count
+        @word_totals[word] += count
       end
     end
 
@@ -48,6 +50,7 @@ module SimpleBayes
         if @total_words >= 0
           orig = @categories[category][word]
           @categories[category][word]      -=     count
+          @word_totals[word] -= count
           if @categories[category][word] <= 0
             @categories[category].delete(word)
             count = orig
@@ -66,9 +69,7 @@ module SimpleBayes
           # Increment for each unique word
           unique_words += 1
           # P(B), we'll want to pre-calculate some of this to save time
-          word_total = @categories.inject(0) do |sum, (cat, cws)|
-            sum + cws[word]
-          end.to_f
+          word_total = @word_totals[word].to_f
           # And now, Bayes' Theorem: P(A|B) = P(B|A) * P(A) / P(B), but
           # we get a lot of simplifications in the end.... sweet!
           if word_total > 0
@@ -84,8 +85,9 @@ module SimpleBayes
     end
 
     def classify(text)
-      puts classifications(text)
-      (classifications(text).sort_by { |a| -a[1] })[0][0]
+      classifications(text).inject([nil, -1]) do |max, cs_pair|
+        max.last > cs_pair.last ? max : cs_pair
+      end.first
     end
 
     def categories # :nodoc:
