@@ -24,5 +24,6 @@
 # Copyright:: Copyright (c) 2005 Lucas Carlson
 # License::   LGPL
 
+require 'classifier/version'
 require 'classifier/word_hash'
 require 'classifier/bayes'
