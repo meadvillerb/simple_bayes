@@ -27,4 +27,3 @@
 require 'rubygems'
 require 'classifier/word_hash'
 require 'classifier/bayes'
-require 'classifier/lsi'
