@@ -24,6 +24,5 @@
 # Copyright:: Copyright (c) 2005 Lucas Carlson
 # License::   LGPL
 
-require 'rubygems'
 require 'classifier/word_hash'
 require 'classifier/bayes'
