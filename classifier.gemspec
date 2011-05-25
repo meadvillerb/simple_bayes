@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
   s.files        = `git ls-files app lib`.split("\n")
   s.platform     = Gem::Platform::RUBY
   s.require_path = 'lib'
-#  s.rubyforge_project = '[none]'
 
   s.add_dependency('ruby-stemmer', '>= 0.9.1')
   s.requirements << "A stemmer module to split word stems."
