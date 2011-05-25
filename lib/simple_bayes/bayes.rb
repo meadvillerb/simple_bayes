@@ -91,7 +91,7 @@ module SimpleBayes
           end
         end
         if unique_words > 0
-          score[category] /= unique_words
+          score[category.to_s] /= unique_words
         end
       end
       score
