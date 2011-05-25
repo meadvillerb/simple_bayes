@@ -17,5 +17,6 @@ Authors
 * Leo Soto (https://github.com/leosoto)
 * Kyle S. Goodwin (https://github.com/goodwink)
 * Ezekiel Templin (https://github.com/ezkl)
+* Ian Eccles (https://github.com/iande)
 
 This library is released under the terms of the GNU LGPL. See LICENSE for more details.
