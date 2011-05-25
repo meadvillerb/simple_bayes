@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.summary      = "Bayesian and LSI classification in Ruby."
   s.description  = "Classifier is a general module to allow Bayesian and other types of classifications. Forked at nragaz/classifier from cardmagic/classifier."
 
-  s.files        = `git ls-files app lib`.split("\n")
+  s.files        = `git ls-files lib`.split("\n")
   s.platform     = Gem::Platform::RUBY
   s.require_path = 'lib'
 
