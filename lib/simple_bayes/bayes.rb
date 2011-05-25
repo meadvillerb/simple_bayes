@@ -56,22 +56,8 @@ module SimpleBayes
         end
       end
     end
-  
-    def classifications(text)
-      score = Hash.new
-      @categories.each do |category, category_words|
-        score[category.to_s] = 0
-        total = category_words.values.inject(0) {|sum, element| sum+element}
-        WordHash.new(text).each do |word, count|
-          s = category_words.has_key?(word) ? category_words[word] : 0.1
-          # This is only (kind of) bayes if P(A) = P(B) = 1.0
-          score[category.to_s] += Math.log(s/total.to_f)
-        end
-      end
-      score
-    end
     
-    def classifications2 text
+    def classifications text
       score = {}
       @categories.each do |category, category_words|
         score[category.to_s] = 0
@@ -86,7 +72,7 @@ module SimpleBayes
           # And now, Bayes' Theorem: P(A|B) = P(B|A) * P(A) / P(B), but
           # we get a lot of simplifications in the end.... sweet!
           if word_total > 0
-            word_score = category_words[word] / word_total
+            word_score = (category_words[word] / word_total)
             score[category.to_s] += word_score
           end
         end
@@ -98,6 +84,7 @@ module SimpleBayes
     end
 
     def classify(text)
+      puts classifications(text)
       (classifications(text).sort_by { |a| -a[1] })[0][0]
     end
 
