@@ -4,20 +4,14 @@
 # Copyright:: Copyright (c) 2005 Lucas Carlson
 # License::   LGPL
 
-module SimpleBayes
-  class << self
-    def new(*categories)
-      Bayes.new(categories)
-    end
-  end
-  
+module SimpleBayes  
   class Bayes
+    attr_reader :categories, :total_words
     
     # The class can be created with one or more categories, each of which will be
     # initialized and given a training method. E.g., 
     #      b = SimpleBayes::Bayes.new :interesting, :uninteresting
     def initialize(*categories)
-      options = categories.pop if categories.last.is_a? Hash
       @categories = Hash.new
       categories.each { |category| @categories[category] = Hash.new }      
       @total_words = 0

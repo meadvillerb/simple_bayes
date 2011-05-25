@@ -33,5 +33,10 @@ describe SimpleBayes::Bayes do
     @b.untrain :interesting, "This text is interesting."
     @b.instance_variable_get(:@categories)[:interesting].should eq Hash.new
   end
+  
+  it "should have some half-assed classify tests" do
+    @b.train :interesting, "This text is interesting."
+    @b.classify("Is this interesting?").should eq "interesting"
+  end
 	
 end
