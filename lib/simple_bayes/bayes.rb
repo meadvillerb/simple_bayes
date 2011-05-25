@@ -1,6 +1,8 @@
 # encoding: utf-8
 
-# Author::    Lucas Carlson  (mailto:lucas@rufy.com)
+# Author::    Zeke Templin
+#             Ian D. Eccles
+#             Lucas Carlson  (mailto:lucas@rufy.com)
 # Copyright:: Copyright (c) 2005 Lucas Carlson
 # License::   LGPL
 
@@ -60,15 +62,34 @@ module SimpleBayes
       end
     end
     
+    
+    # Calculates how the text scores for each category.  For each category
+    # we calculate the score of each word as follows:
+    #
+    #   P(B|A) = (occurrences of word in category) / (word count of category)
+    #   P(A)   = (word count of category) / (total word count)
+    #   P(B)   = (total occurrences of word) / (total word count)
+    # Then,
+    #
+    #   P(A|B) = P(B|A) * P(A) / P(B)
+    #
+    # We simplify by factoring out repeated terms and arrive at:
+    #
+    #   P(A|B) = (occurences of word in category) / (total word count)
+    #
+    # Finally, we sum all of these P(A|B) values and divide by the total
+    # number of unique words in the given text, thus producing a value in
+    # [0, 1].
+    #
+    # This may be wrong, as it seems almost too simple, but at least it's
+    # spelled out how we're arriving at our scores.
     def classifications text
       score = {}
       @categories.each do |category, category_words|
         score[category.to_s] = 0
         unique_words = 0
         WordHash.new(text).each do |word, count|
-          # Increment for each unique word
           unique_words += 1
-          # P(B), we'll want to pre-calculate some of this to save time
           word_total = @word_totals[word].to_f
           # And now, Bayes' Theorem: P(A|B) = P(B|A) * P(A) / P(B), but
           # we get a lot of simplifications in the end.... sweet!
