@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 #--
 # Copyright (c) 2005 Lucas Carlson
 #
@@ -23,8 +25,6 @@
 # Author::    Lucas Carlson  (mailto:lucas@rufy.com)
 # Copyright:: Copyright (c) 2005 Lucas Carlson
 # License::   LGPL
-
-require 'lingua/stemmer'
 
 
 require 'simple_bayes/version'

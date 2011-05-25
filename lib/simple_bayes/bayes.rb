@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # Author::    Lucas Carlson  (mailto:lucas@rufy.com)
 # Copyright:: Copyright (c) 2005 Lucas Carlson
 # License::   LGPL
@@ -39,7 +41,7 @@ module SimpleBayes
     #     b.train :this, "This text"
     #     b.untrain :this, "This text"
     def untrain(category, text)
-      WordHash.new(text, :clean_source => false, :stemmer_language => stemmer_language).each do |word, count|
+      WordHash.new(text).each do |word, count|
         if @total_words >= 0
           orig = @categories[category][word]
           @categories[category][word]     ||=     0
@@ -63,7 +65,7 @@ module SimpleBayes
       @categories.each do |category, category_words|
         score[category.to_s] = 0
         total = category_words.values.inject(0) {|sum, element| sum+element}
-        WordHash.new(text, :clean_source => false, :stemmer_language => stemmer_language).each do |word, count|
+        WordHash.new(text).each do |word, count|
           s = category_words.has_key?(word) ? category_words[word] : 0.1
           score[category.to_s] += Math.log(s/total.to_f)
         end
@@ -84,20 +86,11 @@ module SimpleBayes
     # Provides a list of category names
     # For example:
     #     b.categories
-    #     =>   ['This', 'That', 'the_other']
+    #     =>   [:interesting, :uninteresting, :marginally_interesting]
     def categories # :nodoc:
-      @categories.keys.collect {|c| c.to_s}
+      @categories.keys.collect {|c| c }
     end
 
-    #
-    # Allows you to add categories to the classifier.
-    # For example:
-    #     b.add_category "Not spam"
-    #
-    # WARNING: Adding categories to a trained classifier will
-    # result in an undertrained category that will tend to match
-    # more criteria than the trained selective categories. In short,
-    # try to initialize your categories at initialization.
     def add_category(category)
       @categories[category] = Hash.new
     end
