@@ -13,16 +13,16 @@ module SimpleBayes
 	
 	class WordHash < Hash
 		def initialize(source)
+		  super()
 			@skip_words = CORPUS_SKIP_WORDS
 			populate_with(strip_punctuation(source).split)
-			super
 		end
 		
 		private
 		
 		def populate_with(words)
 			words.each do |word|
-				word.downcase! if word =~ /[\w|']+/
+				word.downcase! if word =~ /[\w]+/
 				if valid?( word )
 					self[word] ||= 0
 					self[word] += 1
@@ -35,7 +35,7 @@ module SimpleBayes
 		end
 		
 		def valid?(string)
-			string =~ /[^\w|']/ || !@skip_words.include?(string)
+			string =~ /[^\w]/ || !@skip_words.include?(string)
 		end
 
 		CORPUS_SKIP_WORDS = [

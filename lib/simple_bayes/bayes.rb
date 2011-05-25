@@ -5,29 +5,40 @@
 # License::   LGPL
 
 module SimpleBayes
+  class << self
+    def new(*categories)
+      Bayes.new(categories)
+    end
+  end
+  
   class Bayes
-    attr_accessor :stemmer_language
+    
     # The class can be created with one or more categories, each of which will be
     # initialized and given a training method. E.g., 
-    #      b = Classifier::Bayes.new 'Interesting', 'Uninteresting', 'Spam'
+    #      b = SimpleBayes::Bayes.new :interesting, :uninteresting
     def initialize(*categories)
       options = categories.pop if categories.last.is_a? Hash
       @categories = Hash.new
+      
+      categories.each do |category|
+        @categories[category] = Hash.new
+      end
+      
       @total_words = 0
-      self.stemmer_language = (options[:stemmer_language] if options) || :en
     end
 
     #
     # Provides a general training method for all categories specified in Bayes#new
     # For example:
-    #     b = Classifier::Bayes.new 'This', 'That', 'the_other'
+    #     b = SimpleBayes::Bayes.new :this, :that, :the_other
     #     b.train :this, "This text"
-    #     b.train "that", "That text"
-    #     b.train "The other", "The other text"
+    #     b.train :that, "That text"
+    #     b.train :the_other, "The other text"
+    
     def train(category, text)
-      WordHash.new(text, :clean_source => false, :stemmer_language => stemmer_language).each do |word, count|
-        @categories[category][word]     ||=     0
-        @categories[category][word]      +=     count
+      WordHash.new(text).each do |word, count|
+        @categories[category][word] ||=     0
+        @categories[category][word] +=     count
         @total_words += count
       end
     end
@@ -37,7 +48,7 @@ module SimpleBayes
     # Be very careful with this method.
     #
     # For example:
-    #     b = Classifier::Bayes.new 'This', 'That', 'the_other'
+    #     b = SimpleBayes::Bayes.new :this, :that, :the_other
     #     b.train :this, "This text"
     #     b.untrain :this, "This text"
     def untrain(category, text)
@@ -55,11 +66,6 @@ module SimpleBayes
       end
     end
   
-    #
-    # Returns the scores in each category the provided +text+. E.g.,
-    #    b.classifications "I hate bad words and you"
-    #    =>  {"Uninteresting"=>-12.6997928013932, "Interesting"=>-18.4206807439524}
-    # The largest of these scores (the one closest to 0) is the one picked out by #classify
     def classifications(text)
       score = Hash.new
       @categories.each do |category, category_words|
@@ -73,20 +79,10 @@ module SimpleBayes
       score
     end
 
-    #
-    # Returns the classification of the provided +text+, which is one of the 
-    # categories given in the initializer. E.g.,
-    #    b.classify "I hate bad words and you"
-    #    =>  'Uninteresting'
     def classify(text)
       (classifications(text).sort_by { |a| -a[1] })[0][0]
     end
 
-    #
-    # Provides a list of category names
-    # For example:
-    #     b.categories
-    #     =>   [:interesting, :uninteresting, :marginally_interesting]
     def categories # :nodoc:
       @categories.keys.collect {|c| c }
     end
@@ -97,11 +93,5 @@ module SimpleBayes
 
     alias append_category add_category
 
-
-    private
-
-    def prepare_category_name(category)
-      category.intern
-    end
   end
 end
