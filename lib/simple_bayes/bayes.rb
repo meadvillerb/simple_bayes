@@ -4,26 +4,20 @@
 # Copyright:: Copyright (c) 2005 Lucas Carlson
 # License::   LGPL
 
-module SimpleBayes
-  class << self
-    def new(*categories)
-      Bayes.new(categories)
-    end
-  end
-  
+module SimpleBayes  
   class Bayes
+    attr_reader :categories, :total_words
     
     # The class can be created with one or more categories, each of which will be
     # initialized and given a training method. E.g., 
     #      b = SimpleBayes::Bayes.new :interesting, :uninteresting
     def initialize(*categories)
-      options = categories.pop if categories.last.is_a? Hash
       @categories = Hash.new
-      
+
       categories.each do |category|
         @categories[category] = Hash.new { |h,k| h[k] = 0 }
       end
-      
+
       @total_words = 0
     end
 
@@ -34,7 +28,6 @@ module SimpleBayes
     #     b.train :this, "This text"
     #     b.train :that, "That text"
     #     b.train :the_other, "The other text"
-    
     def train(category, text)
       WordHash.new(text).each do |word, count|
         @categories[category][word] +=     count
@@ -117,8 +110,10 @@ module SimpleBayes
     def add_category(category)
       @categories[category] = Hash.new
     end
-
-    alias append_category add_category
-
+    
+    def remove_category(category)
+      @categories.delete(category)
+    end
+    
   end
 end
