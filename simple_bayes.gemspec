@@ -1,14 +1,14 @@
 # encoding: utf-8
 
 $:.unshift File.expand_path('../lib', __FILE__)
-require 'classifier/version'
+require 'simple_bayes/version'
 
 Gem::Specification.new do |s|
-  s.name         = "classifier"
-  s.version      = Classifier::VERSION
-  s.authors      = ["Lucas Carlson"]
-  s.email        = "lucas@rufy.com"
-  s.homepage     = "http://github.com/nragaz/classifier"
+  s.name         = "simple_bayes"
+  s.version      = SimpleBayes::VERSION
+  s.authors      = ["Ezekiel Templin", "Lucas Carlson"]
+  s.email        = "ezkl@me.com"
+  s.homepage     = "http://github.com/ezkl/simple_bayes"
   s.summary      = "Bayesian and LSI classification in Ruby."
   s.description  = "Classifier is a general module to allow Bayesian and other types of classifications. Forked at nragaz/classifier from cardmagic/classifier."
 

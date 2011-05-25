@@ -11,7 +11,7 @@
 
 require 'lingua/stemmer'
 
-module Classifier
+module SimpleBayes
   
   class WordHash < Hash
 

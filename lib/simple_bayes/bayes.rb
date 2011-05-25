@@ -2,7 +2,7 @@
 # Copyright:: Copyright (c) 2005 Lucas Carlson
 # License::   LGPL
 
-module Classifier
+module SimpleBayes
 
 class Bayes
 
