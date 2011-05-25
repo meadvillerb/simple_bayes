@@ -19,11 +19,7 @@ module SimpleBayes
     def initialize(*categories)
       options = categories.pop if categories.last.is_a? Hash
       @categories = Hash.new
-      
-      categories.each do |category|
-        @categories[category] = Hash.new
-      end
-      
+      categories.each { |category| @categories[category] = Hash.new }      
       @total_words = 0
     end
 
@@ -34,7 +30,6 @@ module SimpleBayes
     #     b.train :this, "This text"
     #     b.train :that, "That text"
     #     b.train :the_other, "The other text"
-    
     def train(category, text)
       WordHash.new(text).each do |word, count|
         @categories[category][word] ||=     0
@@ -90,8 +85,10 @@ module SimpleBayes
     def add_category(category)
       @categories[category] = Hash.new
     end
-
-    alias append_category add_category
-
+    
+    def remove_category(category)
+      @categories.delete(category)
+    end
+    
   end
 end
