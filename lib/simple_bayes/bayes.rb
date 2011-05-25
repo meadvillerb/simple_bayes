@@ -11,9 +11,6 @@ module SimpleBayes
     def initialize(*categories)
       options = categories.pop if categories.last.is_a? Hash
       @categories = Hash.new
-      categories.each { |category|
-        @categories[prepare_category_name(category)] = Hash.new
-      }
       @total_words = 0
       self.stemmer_language = (options[:stemmer_language] if options) || :en
     end
@@ -26,7 +23,6 @@ module SimpleBayes
     #     b.train "that", "That text"
     #     b.train "The other", "The other text"
     def train(category, text)
-      category = prepare_category_name(category)
       WordHash.new(text, :clean_source => false, :stemmer_language => stemmer_language).each do |word, count|
         @categories[category][word]     ||=     0
         @categories[category][word]      +=     count
@@ -43,7 +39,6 @@ module SimpleBayes
     #     b.train :this, "This text"
     #     b.untrain :this, "This text"
     def untrain(category, text)
-      category = prepare_category_name(category)
       WordHash.new(text, :clean_source => false, :stemmer_language => stemmer_language).each do |word, count|
         if @total_words >= 0
           orig = @categories[category][word]
@@ -104,7 +99,7 @@ module SimpleBayes
     # more criteria than the trained selective categories. In short,
     # try to initialize your categories at initialization.
     def add_category(category)
-      @categories[prepare_category_name(category)] = Hash.new
+      @categories[category] = Hash.new
     end
 
     alias append_category add_category
@@ -113,7 +108,7 @@ module SimpleBayes
     private
 
     def prepare_category_name(category)
-      category.to_s.gsub("_"," ").capitalize.intern
+      category.intern
     end
   end
 end
