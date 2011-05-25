@@ -75,9 +75,6 @@ module SimpleBayes
       score = {}
       @categories.each do |category, category_words|
         score[category.to_s] = 0
-        cat_total = category_words.values.inject(0) { |sum, n| sum + n }.to_f
-        # P(A), roughly
-        cat_prob = cat_total / @total_words
         unique_words = 0
         WordHash.new(text).each do |word, count|
           # Increment for each unique word
@@ -86,14 +83,15 @@ module SimpleBayes
           word_total = @categories.inject(0) do |sum, (cat, cws)|
             sum + cws[word]
           end.to_f
-          word_prob = word_total / @total_words
-          # P(B|A)
-          word_given_prob = category_words[word] / cat_total
-          # And now, Bayes' Theorem: P(A|B) = P(B|A) * P(A) / P(B)
-          score[category.to_s] += word_given_prob * cat_prob / word_prob
+          # And now, Bayes' Theorem: P(A|B) = P(B|A) * P(A) / P(B), but
+          # we get a lot of simplifications in the end.... sweet!
+          if word_total > 0
+            word_score = category_words[word] / word_total
+            score[category.to_s] += word_score
+          end
         end
-        score.each do |cat, s|
-          score[cat] = s / unique_words
+        if unique_words > 0
+          score[category] /= unique_words
         end
       end
       score
