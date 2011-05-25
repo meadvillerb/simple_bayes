@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.name          = "simple_bayes"
   s.version       = SimpleBayes::VERSION
   s.platform      = Gem::Platform::RUBY
-  s.authors       = ["Lucas Carlson", "Ezekiel Templin", "Nick Ragaz", "Leo Soto", "Kyle Goodwin"]
+  s.authors       = ["Lucas Carlson", "Ezekiel Templin", "Ian Eccles", "Nick Ragaz", "Leo Soto", "Kyle Goodwin"]
   s.email         = "ezkl@me.com"
   s.homepage      = "https://github.com/ezkl/simple_bayes"
   s.summary       = "A Bayes-centric, slim fork of Lucas Carlson's classifier library."
