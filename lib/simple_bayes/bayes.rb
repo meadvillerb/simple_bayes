@@ -17,8 +17,8 @@ module SimpleBayes
       @categories = Hash.new
 
       @word_totals = Hash.new { |h,k| h[k] = 0 }
-      categories.each do |category|
-        @categories[category] = Hash.new { |h,k| h[k] = 0 }
+      categories.each do |cat|
+        add_category cat
       end
 
       @total_words = 0
@@ -33,7 +33,7 @@ module SimpleBayes
     #     b.train :the_other, "The other text"
     def train(category, text)
       WordHash.new(text).each do |word, count|
-        @categories[category][word] +=     count
+        @categories[category.to_sym].store(word, count)
         @total_words += count
         @word_totals[word] += count
       end
@@ -50,14 +50,9 @@ module SimpleBayes
     def untrain(category, text)
       WordHash.new(text).each do |word, count|
         if @total_words >= 0
-          orig = @categories[category][word]
-          @categories[category][word]      -=     count
-          @word_totals[word] -= count
-          if @categories[category][word] <= 0
-            @categories[category].delete(word)
-            count = orig
-          end
-          @total_words -= count
+          removed = @categories[category.to_sym].remove(word, count)
+          @word_totals[word] -= removed
+          @total_words -= removed
         end
       end
     end
@@ -85,8 +80,8 @@ module SimpleBayes
     # spelled out how we're arriving at our scores.
     def classifications text
       score = {}
-      @categories.each do |category, category_words|
-        score[category.to_s] = 0
+      @categories.each do |cname, category|
+        score[cname] = 0
         unique_words = 0
         WordHash.new(text).each do |word, count|
           unique_words += 1
@@ -94,12 +89,12 @@ module SimpleBayes
           # And now, Bayes' Theorem: P(A|B) = P(B|A) * P(A) / P(B), but
           # we get a lot of simplifications in the end.... sweet!
           if word_total > 0
-            word_score = (category_words[word] / word_total)
-            score[category.to_s] += word_score
+            word_score = category.count(word) / word_total
+            score[cname] += word_score
           end
         end
         if unique_words > 0
-          score[category.to_s] /= unique_words
+          score[cname] /= unique_words
         end
       end
       score
@@ -110,17 +105,25 @@ module SimpleBayes
         max.last > cs_pair.last ? max : cs_pair
       end.first
     end
-
-    def categories # :nodoc:
-      @categories.keys.collect {|c| c }
+    
+    def category_names # :nodoc:
+      categories.map { |c| c.name }
+    end
+    
+    def category name
+      @categories[name.to_sym]
+    end
+    
+    def categories
+      @categories.values
     end
 
     def add_category(category)
-      @categories[category] = Hash.new
+      @categories[category.to_sym] = Category.new(category)
     end
     
     def remove_category(category)
-      @categories.delete(category)
+      @categories.delete category.to_sym
     end
     
   end
