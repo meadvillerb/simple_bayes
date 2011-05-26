@@ -39,5 +39,9 @@ module SimpleBayes
         0
       end
     end
+    
+    def count_unique
+      @term_counts.select { |t,c| c > 0 }.size
+    end
   end
 end

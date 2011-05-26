@@ -5,7 +5,7 @@
 # License::   LGPL
 
 module SimpleBayes
-  module Classifier
+  module Categorical
     def create_categories cats
       cats.each { |c| add_category c }
     end

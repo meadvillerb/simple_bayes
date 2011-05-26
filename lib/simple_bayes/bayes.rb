@@ -8,7 +8,7 @@
 
 module SimpleBayes  
   class Bayes
-    include Classifier
+    include Categorical
     
     attr_reader :categories, :total_words
     

@@ -30,5 +30,5 @@
 require 'simple_bayes/version'
 require 'simple_bayes/word_hash'
 require 'simple_bayes/category'
-require 'simple_bayes/classifier'
+require 'simple_bayes/categorical'
 require 'simple_bayes/bayes'

@@ -38,4 +38,11 @@ describe SimpleBayes::Category do
   it "should count unknown terms as 0" do
     category.count('mclargehuge').should == 0
   end
+  
+  it "should count the number of unique terms" do
+    category.store 'hello', 5
+    category.store 'world', 2
+    category.remove 'hello', 5
+    category.count_unique.should == 1
+  end
 end
