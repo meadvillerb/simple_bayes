@@ -1,34 +1,51 @@
 # encoding: utf-8
 # Author::		Lucas Carlson	 (mailto:lucas@rufy.com)
+#             Ian D. Eccles
 # Copyright:: Copyright (c) 2005 Lucas Carlson
 # License::		LGPL
 
-# These are extensions to the String class to provide convenience
-# methods for the Classifier package.
-# 
-# This class wraps Hash instead of adding methods to String, to avoid
-# extending the core class too much.
+# Instances of this class essentially basic TermOccurrence implementors that
+# do a bit of filtering on a given string of text.  They strip the text of
+# all punctuation then downcase and filter the resulting words.  Some
+# convenience methods have been added to make instances behave similarly
+# to hashes, such as the +[]+ method, as well as being
+# Enumerable with the +each+ method calling the internal hash's +each+ method.
 
 module SimpleBayes
-	
-	class Document < Hash
-		def initialize(source)
-		  super()
-			populate_with(strip_punctuation(source).split)
+	class Document
+	  include Enumerable
+	  include TermOccurrence
+	  
+	  attr_reader :term_occurrences
+	  
+		def initialize text
+		  @term_occurrences = Hash.new 0
+			populate_with strip_punctuation(text).split
 		end
+		
+		def [] term
+		  term_occurrences[term]
+	  end
+		
+		def each &block
+		  term_occurrences.each(&block)
+	  end
 		
 		private
 		def populate_with(words)
 			words.each do |word|
 				word.downcase! if word =~ /[\w]+/
-				if valid?( word )
-					self[word] ||= 0
-					self[word] += 1
+				if valid? word
+				  store_term word, 1
 				end
 			end
 		end
 		
 		def strip_punctuation(string)
+		  # What about "'" ?  CORPUS_SKIP_WORDS includes contractions sans
+		  # the apostrophe, but there doesn't seem to be anything that actually
+		  # deals with apostrophes.  I'm really beginning to think this isn't
+		  # all that helpful.
 			string.tr(',?.!;:"@#$%^&*()_=+[]{}\|<>/`~-', " ")
 		end
 		

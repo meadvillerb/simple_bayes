@@ -25,21 +25,5 @@ module SimpleBayes
     def remove_category name
       categories.delete(name.to_sym)
     end
-    
-    # def count_term term
-    #   categories.inject(0) { |sum, (_,c)| sum + c.count_term(term) }
-    # end
-    # 
-    # def count_documents
-    #   categories.inject(0) { |sum, (_,c)| sum + c.count_documents }
-    # end
-    # 
-    # def count_unique_terms
-    #   categories.inject(0) { |sum, (_,c)| sum + c.count_unique_terms }
-    # end
-    # 
-    # def count_terms
-    #   categories.inject(0) { |sum, (_,c)| sum + c.count_terms }
-    # end
   end
 end

@@ -2,54 +2,77 @@ require 'spec_helper'
 
 describe SimpleBayes::Category do
   let(:category) { SimpleBayes::Category.new 'unnamed' }
+  let(:classifier) { mock('classifier') }
   
-  it "should keep a record of terms stored" do
-    category.store 'hello', 5
-    category.store 'world', 2
-    category.store 'hello', 3
-    category.count_term('hello').should == 8
-    category.count_term('world').should == 2
+  it "should include TermOccurrence" do
+    category.should be_a_kind_of(SimpleBayes::TermOccurrence)
   end
   
-  it "should keep a record of terms removed" do
-    category.store 'hello', 37
-    category.remove 'hello', 18
-    category.count_term('hello').should == 19
+  it "should calculate its log probability based on the unique terms of itself and a classifier" do
+    category.stub(:total_unique => 8)
+    classifier.stub(:total_unique => 32)
+    category.log_probability(classifier).should be_within(1.0e-10).of(Math.log 0.25)
   end
   
-  it "should return the number of occurrences of a term actually removed" do
-    category.store 'hello', 37
-    category.remove('hello', 25).should == 25
-    category.remove('hello', 9000).should == 12
-    category.remove('hello').should == 0
+  it "should return the 'biggest' negative float if either it or the classifier lack unique terms" do
+    category.stub(:total_unique => 0)
+    classifier.stub(:total_unique => 32)
+    category.log_probability(classifier).should == -Float::MAX
+    category.stub(:total_unique => 8)
+    classifier.stub(:total_unique => 0)
+    category.log_probability(classifier).should == -Float::MAX
   end
   
-  it "should remove all counts for a term if count is not specified" do
-    category.store 'hello', 37
-    category.remove 'hello'
-    category.count_term('hello').should == 0
+  it "should calculate its probability based on the unique terms of itself and a classifier" do
+    category.stub(:total_unique => 8)
+    classifier.stub(:total_unique => 32)
+    category.probability(classifier).should be_within(1.0e-10).of(0.25)
   end
   
-  it "should record a term as occurring once if no count is specified" do
-    category.store 'hello'
-    category.count_term('hello').should == 1
+  it "should be close to 0 if either it or the classifier lack unique terms" do
+    category.stub(:total_unique => 0)
+    classifier.stub(:total_unique => 32)
+    category.probability(classifier).should be_within(1.0e-10).of(0.0)
+    category.stub(:total_unique => 8)
+    classifier.stub(:total_unique => 0)
+    category.probability(classifier).should be_within(1.0e-10).of(0.0)
   end
   
-  it "should count unknown terms as 0" do
-    category.count_term('mclargehuge').should == 0
+  it "should calculate the log probability of a document given the category" do
+    category.stub(:total_occurrences => 100)
+    category.stub(:occurrences_of).with('this') { 20 }
+    category.stub(:occurrences_of).with('that') { 10 }
+    category.stub(:occurrences_of).with('other') { 5 }
+    category.log_probability_of_document({
+      'this' => 56,
+      'that' => 9001,
+      'other' => 19 }).should be_within(1.0e-10).of(Math.log(0.05) + Math.log(0.1) + Math.log(0.2))
   end
   
-  it "should count the number of unique terms" do
-    category.store 'hello', 5
-    category.store 'world', 2
-    category.remove 'hello', 5
-    category.count_unique_terms.should == 1
+  it "should be the 'biggest' negative float for log probability if we have no terms" do
+    category.stub(:total_occurrences => 0)
+    category.log_probability_of_document({
+      'this' => 56,
+      'that' => 9001,
+      'other' => 19 }).should == -Float::MAX
   end
   
-  it "should count all occurrences of all terms" do
-    category.store 'hello', 5
-    category.store 'world', 3
-    category.remove 'hello', 1
-    category.count_terms.should == 7
+  it "should calculate the probability of a document given the category" do
+    category.stub(:total_occurrences => 100)
+    category.stub(:occurrences_of).with('this') { 20 }
+    category.stub(:occurrences_of).with('that') { 10 }
+    category.stub(:occurrences_of).with('other') { 5 }
+    category.probability_of_document({
+      'this' => 56,
+      'that' => 9001,
+      'other' => 19 }).should be_within(1.0e-10).of(0.05 * 0.1 * 0.2)
+  end
+  
+  it "should be close to 0 for probability if we have no terms" do
+    category.stub(:total_occurrences => 0)
+    category.probability_of_document({
+      'this' => 56,
+      'that' => 9001,
+      'other' => 19 }).should be_within(1.0e-10).of(0.0)
   end
 end

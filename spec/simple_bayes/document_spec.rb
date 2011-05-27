@@ -7,18 +7,39 @@ describe SimpleBayes::Document do
   }
 
 	it "should strip punctuation" do
-		document.keys.each do |word|
+		document.unique_terms.each do |word|
 			word.should match /\w/i
 		end
 	end
 	
 	it "should return a hash with 'uncommon' words as keys" do
-		document.keys.should eq ["23","skidoo","what'd","say","about","heard","something"]
-		document.keys.count.should eq 7
+		document.unique_terms.should eq ["23","skidoo","what'd","say","about","heard","something"]
+		document.total_unique.should eq 7
 	end
 	
-	it "should return a hash with word frequencies as values" do
-		hash = { "23" => 3, "skidoo" => 1, "what'd" => 1, "say" => 2, "about" => 1, "heard" => 1, "something" => 1 }
-		document.should eq hash
+	it "should return term occurrences when accessed like a hash" do
+	  document["say"].should == 2
+	  document["23"].should == 3
+	  document["you"].should == 0
+	end
+	
+	it "should iterate over the internal hash of occurrences" do
+	  collected = {}
+	  document.each do |term, occurs|
+	    collected[term] = occurs
+    end
+    collected.should == {
+      '23' => 3,
+      'skidoo' => 1,
+      "what'd" => 1,
+      'say' => 2,
+      'about' => 1,
+      'heard' => 1,
+      'something' => 1
+    }
+	end
+	
+	it "should be enumerable" do
+	  document.should be_a_kind_of(Enumerable)
 	end
 end

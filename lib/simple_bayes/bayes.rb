@@ -9,15 +9,16 @@
 module SimpleBayes  
   class Bayes
     include Categorical
+    include TermOccurrence
     
-    attr_reader :categories, :term_frequencies
+    attr_reader :categories, :term_occurrences
     
     # The class can be created with one or more categories, each of which will be
     # initialized and given a training method. E.g., 
     #      b = SimpleBayes::Bayes.new :interesting, :uninteresting
     def initialize(*categories)
       @categories = {}
-      @term_frequencies = Hash.new 0
+      @term_occurrences = Hash.new 0
       create_categories categories
     end
 
@@ -30,8 +31,8 @@ module SimpleBayes
     #     b.train :the_other, "The other text"
     def train(name, text)
       doc = Document.new text
-      store_terms doc
-      category(name).train doc
+      store_document doc
+      category(name).store_document doc
     end
 
     #
@@ -44,23 +45,10 @@ module SimpleBayes
     #     b.untrain :this, "This text"
     def untrain(name, text)
       doc = Document.new text
-      remove_terms doc
-      category(name).untrain doc
+      remove_document doc
+      category(name).remove_document doc
     end
-    
-    # Probability that a given category should contain `text`:
-    #
-    #     P(A = category | B = text) = P(A | B1, B2, ... Bn)
-    #
-    # where Bi is a "word" or "term" extracted from B.
-    # Assuming our Bi terms are independent ( P(Bi|Bj) = P(Bi) ), Bayes'
-    # theorem tells us:
-    #
-    #     P(A | B1, ..., Bn) = ( P(A) * P(B1 | A) * ... * P(Bn | A) ) / ( P(B1) * ... * P(Bn) )
-    # 
-    # In our implementation, we'll use the application of a logarithm to
-    # mitigate excessive multiplication rounding to 0.  If the term Bi has
-    # not yet been encountered, we will assume a value of P(Bi) = 0.05.
+
     def classifications text, default_prob = 0.05
       doc = Document.new text
       categories.values.map do |cat|
@@ -79,36 +67,10 @@ module SimpleBayes
       end
     end
 
-    def classify(text)
+    def classify text
       log_classifications(text).inject([-Float::MAX, nil]) do |max, cs_pair|
         max.first > cs_pair.first ? max : cs_pair
       end.last.name
-    end
-    
-    def store_terms doc
-      doc.each do |term, count|
-        @term_frequencies[term] += count
-      end
-    end
-    
-    def remove_terms doc
-      doc.each do |term, count|
-        next unless @term_frequencies.key?(term)
-        freq = @term_frequencies[term]
-        @term_frequencies[term] -= (freq >= count ? count : freq)
-      end
-    end
-    
-    def count_term term
-      @term_frequencies.key?(term) ? @term_frequencies[term] : 0
-    end
-    
-    def count_terms
-      @term_frequencies.inject(0) { |sum, (w,c)| sum + c }
-    end
-    
-    def count_unique_terms
-      @term_frequencies.size
     end
   end
 end

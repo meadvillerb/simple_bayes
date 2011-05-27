@@ -28,17 +28,17 @@ describe SimpleBayes::Bayes do
 	it "should allow categories to be trained" do
 	  classifier.train :interesting, "This text is interesting."
 	  classifier.train :uninteresting, "This text is uninteresting."
-	  classifier.category(:interesting).count_term('text').should == 1
-	  classifier.category(:interesting).count_term('interesting').should == 1
-	  classifier.category(:uninteresting).count_term('text').should == 1
-	  classifier.category(:uninteresting).count_term('uninteresting').should == 1
+	  classifier.category(:interesting).occurrences_of('text').should == 1
+	  classifier.category(:interesting).occurrences_of('interesting').should == 1
+	  classifier.category(:uninteresting).occurrences_of('text').should == 1
+	  classifier.category(:uninteresting).occurrences_of('uninteresting').should == 1
 	end
 
   it "should allow categories to be untrained" do
     classifier.train :interesting, "This text is interesting."
     classifier.untrain :interesting, "This text is interesting."
-	  classifier.category(:interesting).count_term('text').should == 0
-	  classifier.category(:interesting).count_term('interesting').should == 0
+	  classifier.category(:interesting).occurrences_of('text').should == 0
+	  classifier.category(:interesting).occurrences_of('interesting').should == 0
   end
   
   it "should have some half-assed classify tests" do
