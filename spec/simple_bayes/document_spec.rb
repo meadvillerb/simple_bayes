@@ -5,6 +5,10 @@ describe SimpleBayes::Document do
   let(:document) {
     SimpleBayes::Document.new("23 skidoo! What'd you say about 23!? I heard you say something 23.")
   }
+  
+  it "should include TermOccurrence" do
+    document.should be_a_kind_of(SimpleBayes::TermOccurrence)
+  end
 
 	it "should strip punctuation" do
 		document.unique_terms.each do |word|

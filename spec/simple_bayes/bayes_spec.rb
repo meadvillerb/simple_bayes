@@ -5,6 +5,28 @@ describe SimpleBayes::Bayes do
   let(:classifier) {
     SimpleBayes::Bayes.new :interesting, :uninteresting
   }
+  let(:stubby_categories) {
+    [stubby_cat1, stubby_cat2, stubby_cat3]
+  }
+  let(:stubby_cat1) {
+    mock('category 1', :log_probability => 2, :probability => 9,
+      :log_probability_of_document => 91, :probability_of_document => 42,
+      :name => 'category 1')
+  }
+  let(:stubby_cat2) {
+    mock('category 2', :log_probability => 17, :probability => 5,
+      :log_probability_of_document => 32, :probability_of_document => 14,
+      :name => 'category 2')
+  }
+  let(:stubby_cat3) {
+    mock('category 3', :log_probability => 9001, :probability => 42,
+      :log_probability_of_document => 7, :probability_of_document => 8,
+      :name => 'category 3')
+  }
+  
+  it "should include TermOccurrence" do
+    classifier.should be_a_kind_of(SimpleBayes::TermOccurrence)
+  end
   
 	it "should allow categories to be assigned during initialization" do
 	  classifier.category_names.should eq [:interesting, :uninteresting]
@@ -41,9 +63,29 @@ describe SimpleBayes::Bayes do
 	  classifier.category(:interesting).occurrences_of('interesting').should == 0
   end
   
-  it "should have some half-assed classify tests" do
-    classifier.train :interesting, "This text is interesting."
-    classifier.classify("Is this interesting?").should eq :interesting
+  # We are already testing probability calculations in our Category spec,
+  # so all we need to test here is that those numbers are being combined
+  # appropriately.
+  it "should compute log_classifications for each category" do
+    SimpleBayes::Document.should_receive(:new).with('unimportant string')
+    classifier.stub(:categories => mock('categories', :values => stubby_categories))
+    classifier.log_classifications("unimportant string").should == [
+      [93, stubby_cat1], [49, stubby_cat2], [9008, stubby_cat3]
+    ]
   end
-	
+  
+  it "should compute classifications for each category" do
+    SimpleBayes::Document.should_receive(:new).with('unimportant string')
+    classifier.stub(:categories => mock('categories', :values => stubby_categories))
+    classifier.classifications("unimportant string").should == [
+      [9*42, stubby_cat1], [5*14, stubby_cat2], [42*8, stubby_cat3]
+    ]
+  end
+  
+  it "should pick the category with a log classification score closest to 0" do
+    classifier.stub(:log_classifications => [
+      [-190, stubby_cat1], [-10, stubby_cat2], [-Float::MAX, stubby_cat3]
+    ])
+    classifier.classify('unimportant text').should == 'category 2'
+  end
 end
