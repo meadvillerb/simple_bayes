@@ -36,14 +36,14 @@ module SimpleBayes
     #     P(D|C) = \prod_i P(T_i | C)
     #            = \prod_i (occurrences of T_i in C) / (occurrences of all terms in C)
     #
-    # Uses a default probability of 0.05 for a term that does not occur at all
+    # Uses a default probability of 0.005 for a term that does not occur at all
     # in this category.
     # @param [WordHash] doc
-    def probability_of_document doc, default_prob = 0.05
+    def probability_of_document doc, default_prob = 0.005
       Math.exp log_probability_of_document(doc, default_prob)
     end
     
-    def log_probability_of_document doc, default_prob = 0.05
+    def log_probability_of_document doc, default_prob = 0.005
       all_occurs = total_occurrences.to_f
       return -Float::MAX if all_occurs < 1
 

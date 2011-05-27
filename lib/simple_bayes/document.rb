@@ -1,6 +1,6 @@
 # encoding: utf-8
-# Author::		Lucas Carlson	 (mailto:lucas@rufy.com)
-#             Ian D. Eccles
+# Author::		Ian D. Eccles
+#             Lucas Carlson (mailto:lucas@rufy.com)
 # Copyright:: Copyright (c) 2005 Lucas Carlson
 # License::		LGPL
 
@@ -32,7 +32,7 @@ module SimpleBayes
 	  end
 		
 		private
-		def populate_with(words)
+		def populate_with words
 			words.each do |word|
 				word.downcase! if word =~ /[\w]+/
 				if valid? word
@@ -77,18 +77,18 @@ module SimpleBayes
 				"by",
 				"came",
 				"can",
-				"cant",
-				"couldnt",
+				"can't",
+				"couldn't",
 				"did",
-				"didn",
-				"didnt",
+				"didn't",
 				"do",
-				"doesnt",
-				"dont",
+				"doesn't",
+				"don't",
 				"ever",
 				"first",
 				"from",
 				"have",
+				"he",
 				"her",
 				"here",
 				"him",
@@ -98,9 +98,9 @@ module SimpleBayes
 				"in",
 				"into",
 				"is",
-				"isnt",
+				"isn't",
 				"it",
-				"itll",
+				"it'll",
 				"just",
 				"last",
 				"least",
@@ -142,6 +142,6 @@ module SimpleBayes
 				"within",
 				"yes",
 				"you",
-				"youll" ]
+				"you'll" ]
 	end	
 end

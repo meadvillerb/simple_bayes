@@ -49,7 +49,7 @@ module SimpleBayes
       category(name).remove_document doc
     end
 
-    def classifications text, default_prob = 0.05
+    def classifications text, default_prob = 0.005
       doc = Document.new text
       categories.values.map do |cat|
         prob_cat = cat.probability self
@@ -58,7 +58,7 @@ module SimpleBayes
       end
     end
     
-    def log_classifications text, default_prob = 0.05
+    def log_classifications text, default_prob = 0.005
       doc = Document.new text
       categories.values.map do |cat|
         prob_cat = cat.log_probability self
