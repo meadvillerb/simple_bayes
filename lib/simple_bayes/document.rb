@@ -11,15 +11,13 @@
 
 module SimpleBayes
 	
-	class WordHash < Hash
+	class Document < Hash
 		def initialize(source)
 		  super()
-			@skip_words = CORPUS_SKIP_WORDS
 			populate_with(strip_punctuation(source).split)
 		end
 		
 		private
-		
 		def populate_with(words)
 			words.each do |word|
 				word.downcase! if word =~ /[\w]+/
@@ -35,9 +33,18 @@ module SimpleBayes
 		end
 		
 		def valid?(string)
-			string =~ /[^\w]/ || !@skip_words.include?(string)
+		  # So if the string contains a non-word character or it's not in
+		  # the list of skip words, we include it.  But, the string has already
+		  # been stripped of its puncuation, which doesn't leave many non-word
+		  # characters left.  Further, none of the skip words contain non-word
+		  # characters, so if a string does have non-word characters, it is
+		  # not included in @skip_words.  Also, with only one set of skip words,
+		  # we can just refer to the constant.
+			#string =~ /[^\w]/ || !@skip_words.include?(string)
+			!CORPUS_SKIP_WORDS.include?(string)
 		end
 
+    # I question how necessary these are?
 		CORPUS_SKIP_WORDS = [
 				"a",
 				"again",

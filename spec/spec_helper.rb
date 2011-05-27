@@ -7,7 +7,3 @@ end
 require 'rspec'
 
 require 'simple_bayes'
-require 'simple_bayes/bayes'
-require 'simple_bayes/word_hash'
-
-include SimpleBayes
