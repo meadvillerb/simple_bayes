@@ -75,4 +75,26 @@ describe SimpleBayes::Category do
       'that' => 9001,
       'other' => 19 }).should be_within(1.0e-10).of(0.0)
   end
+  
+  it "probability should respect a default probability for unknown terms" do
+    category.stub(:total_occurrences => 100)
+    category.stub(:occurrences_of).with('this') { 20 }
+    category.stub(:occurrences_of).with('that') { 10 }
+    category.stub(:occurrences_of).with('other') { 0 }
+    category.probability_of_document({
+      'this' => 56,
+      'that' => 9001,
+      'other' => 19 }, 0.01).should be_within(1.0e-10).of(0.01 * 0.1 * 0.2)
+  end
+  
+  it "log probability should respect a default probability for unknown terms" do
+    category.stub(:total_occurrences => 100)
+    category.stub(:occurrences_of).with('this') { 20 }
+    category.stub(:occurrences_of).with('that') { 0 }
+    category.stub(:occurrences_of).with('other') { 5 }
+    category.log_probability_of_document({
+      'this' => 56,
+      'that' => 9001,
+      'other' => 19 }, 0.03).should be_within(1.0e-10).of(Math.log(0.05) + Math.log(0.03) + Math.log(0.2))
+  end
 end
