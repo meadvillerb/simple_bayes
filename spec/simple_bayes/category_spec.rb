@@ -46,7 +46,7 @@ describe SimpleBayes::Category do
     category.log_probability_of_document({
       'this' => 56,
       'that' => 9001,
-      'other' => 19 }).should be_within(1.0e-10).of(Math.log(0.05) + Math.log(0.1) + Math.log(0.2))
+      'other' => 19 }).should be_within(1.0e-10).of(Math.log(0.05 * 0.1 * 0.2))
   end
   
   it "should be the 'biggest' negative float for log probability if we have no terms" do
@@ -95,6 +95,6 @@ describe SimpleBayes::Category do
     category.log_probability_of_document({
       'this' => 56,
       'that' => 9001,
-      'other' => 19 }, 0.03).should be_within(1.0e-10).of(Math.log(0.05) + Math.log(0.03) + Math.log(0.2))
+      'other' => 19 }, 0.03).should be_within(1.0e-10).of(Math.log(0.05 * 0.03 * 0.2))
   end
 end
