@@ -52,7 +52,7 @@ module SimpleBayes
     def classifications text, default_prob = 0.005
       doc = Document.new text
       categories.values.map do |cat|
-        prob_cat = cat.probability self
+        prob_cat = cat.probability total_unique.to_f
         prob_doc = cat.probability_of_document(doc, default_prob)
         [prob_cat * prob_doc, cat]
       end
@@ -61,7 +61,7 @@ module SimpleBayes
     def log_classifications text, default_prob = 0.005
       doc = Document.new text
       categories.values.map do |cat|
-        prob_cat = cat.log_probability self
+        prob_cat = cat.log_probability total_unique.to_f
         prob_doc = cat.log_probability_of_document(doc, default_prob)
         [prob_cat + prob_doc, cat]
       end

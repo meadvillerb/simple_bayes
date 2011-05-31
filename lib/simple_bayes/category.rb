@@ -8,6 +8,7 @@ module SimpleBayes
   # Categories are going to be a shared idea, so why not break out the
   # common category functionality into its own class.
   class Category
+    MIN_LOG_PROBABILITY = -Float::MAX
     include TermOccurrence
     
     attr_reader :name, :term_occurrences
@@ -17,18 +18,13 @@ module SimpleBayes
       @term_occurrences = Hash.new 0
     end
     
-    def log_probability classifier
-      uniqs = classifier.total_unique.to_f
-      cat_uniqs = total_unique
-      if uniqs > 0 && cat_uniqs > 0
-        Math.log(cat_uniqs) - Math.log(uniqs)
-      else
-        -Float::MAX
-      end
+    def log_probability uniqs
+      tot = total_unique
+      (uniqs > 0 && tot > 0) ? Math.log(tot/uniqs) : MIN_LOG_PROBABILITY
     end
     
-    def probability classifier
-      Math.exp log_probability(classifier)
+    def probability uniqs
+      Math.exp log_probability(uniqs)
     end
     
     # Calculates the probability of a document given this category, ie:
@@ -44,13 +40,12 @@ module SimpleBayes
     end
     
     def log_probability_of_document doc, default_prob = 0.005
-      all_occurs = total_occurrences.to_f
-      return -Float::MAX if all_occurs < 1
+      all = total_occurrences.to_f
+      return MIN_LOG_PROBABILITY if all < 1
 
       doc.inject(0) do |sum, (t,_)|
-        t_occurs = occurrences_of(t)
-        log_prob_t = (t_occurs > 0 ? (Math.log(t_occurs) - Math.log(all_occurs)) : Math.log(default_prob) )
-        sum + log_prob_t
+        term = occurrences_of(t)
+        sum + Math.log(term > 0 ? term/all : default_prob)
       end
     end
   end

@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe SimpleBayes::Category do
   let(:category) { SimpleBayes::Category.new 'unnamed' }
-  let(:classifier) { mock('classifier') }
   
   it "should include TermOccurrence" do
     category.should be_a_kind_of(SimpleBayes::TermOccurrence)
@@ -10,32 +9,26 @@ describe SimpleBayes::Category do
   
   it "should calculate its log probability based on the unique terms of itself and a classifier" do
     category.stub(:total_unique => 8)
-    classifier.stub(:total_unique => 32)
-    category.log_probability(classifier).should be_within(1.0e-10).of(Math.log 0.25)
+    category.log_probability(32.0).should be_within(1.0e-10).of(Math.log 0.25)
   end
   
   it "should return the 'biggest' negative float if either it or the classifier lack unique terms" do
     category.stub(:total_unique => 0)
-    classifier.stub(:total_unique => 32)
-    category.log_probability(classifier).should == -Float::MAX
+    category.log_probability(32.0).should == -Float::MAX
     category.stub(:total_unique => 8)
-    classifier.stub(:total_unique => 0)
-    category.log_probability(classifier).should == -Float::MAX
+    category.log_probability(0.0).should == -Float::MAX
   end
   
   it "should calculate its probability based on the unique terms of itself and a classifier" do
     category.stub(:total_unique => 8)
-    classifier.stub(:total_unique => 32)
-    category.probability(classifier).should be_within(1.0e-10).of(0.25)
+    category.probability(32.0).should be_within(1.0e-10).of(0.25)
   end
   
   it "should be close to 0 if either it or the classifier lack unique terms" do
     category.stub(:total_unique => 0)
-    classifier.stub(:total_unique => 32)
-    category.probability(classifier).should be_within(1.0e-10).of(0.0)
+    category.probability(32.0).should be_within(1.0e-10).of(0.0)
     category.stub(:total_unique => 8)
-    classifier.stub(:total_unique => 0)
-    category.probability(classifier).should be_within(1.0e-10).of(0.0)
+    category.probability(0.0).should be_within(1.0e-10).of(0.0)
   end
   
   it "should calculate the log probability of a document given the category" do
