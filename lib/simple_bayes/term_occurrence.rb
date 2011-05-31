@@ -37,9 +37,13 @@ module SimpleBayes
         0
       end
     end
-    
+        
     def occurrences_of term
       term_occurrences.key?(term) ? term_occurrences[term] : 0
+    end
+    
+    def frequency_of term
+      occurrences_of(term) / total_occurrences.to_f
     end
     
     def total_occurrences

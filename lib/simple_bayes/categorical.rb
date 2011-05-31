@@ -25,5 +25,15 @@ module SimpleBayes
     def remove_category name
       categories.delete(name.to_sym)
     end
+    
+    def categories_including term
+      categories.values.select { |c| c.occurrences_of(term) > 0 }
+    end
+    
+    def inverse_frequency_of term
+      including = categories_including(term).size
+      return 0 if including.zero?
+      Math.log( categories.size / including.to_f )
+    end
   end
 end

@@ -81,4 +81,13 @@ describe SimpleBayes::TermOccurrence do
     term_occurrence.remove_term 'hello', 1
     term_occurrence.total_occurrences.should == 7
   end
+  
+  it "should calculate the frequency of a term" do
+    term_occurrence.store_term 'hello', 5
+    term_occurrence.store_term 'world', 3
+    term_occurrence.remove_term 'hello', 1
+    term_occurrence.frequency_of('hello').should == (4 / 7.0)
+    term_occurrence.frequency_of('world').should == (3 / 7.0)
+    term_occurrence.frequency_of('nothing').should == 0.0
+  end
 end

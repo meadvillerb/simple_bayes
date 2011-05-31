@@ -46,4 +46,19 @@ describe SimpleBayes::Categorical do
     classifier.remove_category :lame
     classifier.category_names.should =~ ['CUIDADO LLAMA', :blather_blather]
   end
+  
+  it "should return the categories with at least on occurrence of a term" do
+    classifier.create_categories [:cat1, 'CUIDADO LLAMA', :blather_blather]
+    classifier.category(:cat1).store_term 'hello'
+    classifier.category(:blather_blather).store_term 'hello'
+    classifier.categories_including('hello').should =~ [ classifier.category(:cat1),
+      classifier.category(:blather_blather) ]
+    classifier.categories_including('sinner').should be_empty
+  end
+  
+  it "should compute the inverse frequency of a term" do
+    classifier.create_categories [:cat1, :cat2, :cat3, :cat4, :cat5]
+    classifier.stub(:categories_including => [1, 2])
+    classifier.inverse_frequency_of('test').should == Math.log(5 / 2.0)
+  end
 end
